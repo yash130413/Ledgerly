@@ -12,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { AnimateList, AnimateItem } from "@/components/shared/motion";
 import { loginSchema, type LoginInput } from "@/lib/validators";
-import { createClient } from "@/infra/supabase/client";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
 
@@ -25,13 +24,21 @@ export function LoginForm() {
   } = useForm<LoginInput>({ resolver: zodResolver(loginSchema) });
 
   const onSubmit = async (data: LoginInput) => {
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email: data.email, password: data.password }),
     });
-    if (error) { toast.error(error.message); return; }
+    const payload = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      toast.error(
+        payload.message || payload.error || "Invalid email or password"
+      );
+      return;
+    }
+    toast.success("Signed in");
     router.push("/dashboard");
+    router.refresh();
   };
 
   return (

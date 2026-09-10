@@ -3,8 +3,11 @@ export default () => ({
   appUrl: process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
   supabase: {
     url: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    publishableKey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     secretKey: process.env.SUPABASE_SECRET_KEY,
+  },
+  jwt: {
+    secret: process.env.JWT_SECRET || 'dev-ledgerly-jwt-secret-change-me',
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
   anthropicApiKey: process.env.ANTHROPIC_API_KEY,
   resendApiKey: process.env.RESEND_API_KEY,

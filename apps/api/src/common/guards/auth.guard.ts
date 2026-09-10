@@ -4,33 +4,62 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
-import type { User } from '@supabase/supabase-js';
-import { SupabaseService } from '../../infra/supabase/supabase.service';
+import type { AuthUser, JwtPayload } from '../types/auth-user';
 
-export type AuthedRequest = Request & { user?: User };
+export type AuthedRequest = Request & { user?: AuthUser };
+
+function bearerToken(authorization?: string): string | null {
+  if (!authorization?.startsWith('Bearer ')) return null;
+  const token = authorization.slice('Bearer '.length).trim();
+  return token || null;
+}
 
 @Injectable()
 export class OptionalAuthGuard implements CanActivate {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(private readonly jwt: JwtService) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<AuthedRequest>();
-    const user = await this.supabase.getUserFromBearer(req.headers.authorization);
-    if (user) req.user = user;
+    const token = bearerToken(req.headers.authorization);
+    if (!token) return true;
+
+    try {
+      const payload = this.jwt.verify<JwtPayload>(token);
+      req.user = {
+        id: payload.sub,
+        email: payload.email,
+        fullName: payload.fullName ?? null,
+        role: payload.role ?? 'member',
+      };
+    } catch {
+      // optional — ignore invalid token
+    }
     return true;
   }
 }
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(private readonly jwt: JwtService) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<AuthedRequest>();
-    const user = await this.supabase.getUserFromBearer(req.headers.authorization);
-    if (!user) throw new UnauthorizedException('Unauthorized');
-    req.user = user;
-    return true;
+    const token = bearerToken(req.headers.authorization);
+    if (!token) throw new UnauthorizedException('Unauthorized');
+
+    try {
+      const payload = this.jwt.verify<JwtPayload>(token);
+      req.user = {
+        id: payload.sub,
+        email: payload.email,
+        fullName: payload.fullName ?? null,
+        role: payload.role ?? 'member',
+      };
+      return true;
+    } catch {
+      throw new UnauthorizedException('Unauthorized');
+    }
   }
 }

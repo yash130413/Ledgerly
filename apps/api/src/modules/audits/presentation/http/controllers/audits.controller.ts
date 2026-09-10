@@ -51,7 +51,7 @@ export class AuditsController {
     return this.audits.create(body, {
       userId: req.user?.id,
       userEmail: req.user?.email,
-      userDisplayName: (req.user?.user_metadata?.full_name as string) ?? null,
+      userDisplayName: req.user?.fullName ?? null,
       origin,
     });
   }

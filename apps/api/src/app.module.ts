@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { InfraModule } from './infra/infra.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { AuditsModule } from './modules/audits/audits.module';
 import { LeadsModule } from './modules/leads/leads.module';
 import { OrganizationsModule } from './modules/organizations/organizations.module';
@@ -18,6 +19,7 @@ import { HealthController } from './health/health.controller';
       envFilePath: ['.env.local', '.env', '../../.env.local', '../../.env'],
     }),
     InfraModule,
+    AuthModule,
     AuditsModule,
     LeadsModule,
     OrganizationsModule,

@@ -162,6 +162,34 @@ export interface Database {
         };
         Relationships: [];
       };
+      app_users: {
+        Row: {
+          id: string;
+          email: string;
+          password_hash: string;
+          full_name: string | null;
+          company_name: string | null;
+          role: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          email: string;
+          password_hash: string;
+          full_name?: string | null;
+          company_name?: string | null;
+          role?: string;
+        };
+        Update: {
+          email?: string;
+          password_hash?: string;
+          full_name?: string | null;
+          company_name?: string | null;
+          role?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -176,6 +204,7 @@ export type AuditRow = Database["public"]["Tables"]["audits"]["Row"];
 export type AuditRecommendationRow = Database["public"]["Tables"]["audit_recommendations"]["Row"];
 export type LeadRow = Database["public"]["Tables"]["leads"]["Row"];
 export type UserProfileRow = Database["public"]["Tables"]["user_profiles"]["Row"];
+export type AppUserRow = Database["public"]["Tables"]["app_users"]["Row"];
 
 // Public audit with joined recommendations
 export type PublicAudit = AuditRow & {

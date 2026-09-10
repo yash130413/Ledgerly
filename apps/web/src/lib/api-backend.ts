@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/infra/supabase/server";
+import { getAccessToken } from "@/lib/auth/session";
 
 const API_BASE =
   process.env.API_INTERNAL_URL?.replace(/\/$/, "") ?? "http://localhost:3001";
 
 /**
  * BFF proxy: browser keeps calling /api/* on Next;
- * Next forwards to Nest (`apps/api`) so the Nest backend owns business logic.
+ * Next forwards to Nest with JWT from httpOnly cookie.
  */
 export async function proxyToApi(
   req: NextRequest,
   path: string,
-  init?: { method?: string; body?: string | null }
+  init?: {
+    method?: string;
+    body?: string | null;
+    skipAuthForward?: boolean;
+  }
 ): Promise<NextResponse> {
   const method = init?.method ?? req.method;
   const body =
@@ -28,20 +32,15 @@ export async function proxyToApi(
   const forwarded = req.headers.get("x-forwarded-for");
   if (forwarded) headers.set("x-forwarded-for", forwarded);
 
-  try {
-    const supabase = await createClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (session?.access_token) {
-      headers.set("authorization", `Bearer ${session.access_token}`);
+  if (!init?.skipAuthForward) {
+    const authHeader = req.headers.get("authorization");
+    if (authHeader) {
+      headers.set("authorization", authHeader);
+    } else {
+      const token = await getAccessToken();
+      if (token) headers.set("authorization", `Bearer ${token}`);
     }
-  } catch {
-    // local/dev without supabase — public routes still work
   }
-
-  const authHeader = req.headers.get("authorization");
-  if (authHeader) headers.set("authorization", authHeader);
 
   let upstream: Response;
   try {
@@ -74,4 +73,30 @@ export async function proxyToApi(
     status: upstream.status,
     headers: responseHeaders,
   });
+}
+
+/** Low-level fetch to Nest returning parsed JSON (for auth BFF). */
+export async function callApiJson(
+  path: string,
+  init: { method: string; body?: string; token?: string | null }
+): Promise<{ ok: boolean; status: number; data: unknown }> {
+  const headers = new Headers({ "content-type": "application/json" });
+  if (init.token) headers.set("authorization", `Bearer ${init.token}`);
+
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: init.method,
+      headers,
+      body: init.body,
+      cache: "no-store",
+    });
+    const data = await res.json().catch(() => null);
+    return { ok: res.ok, status: res.status, data };
+  } catch {
+    return {
+      ok: false,
+      status: 502,
+      data: { error: "API backend unreachable" },
+    };
+  }
 }

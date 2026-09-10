@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { signupSchema, type SignupInput } from "@/lib/validators";
-import { createClient } from "@/infra/supabase/client";
 
 export function SignupForm() {
   const router = useRouter();
@@ -21,15 +20,25 @@ export function SignupForm() {
   } = useForm<SignupInput>({ resolver: zodResolver(signupSchema) });
 
   const onSubmit = async (data: SignupInput) => {
-    const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: { data: { full_name: data.name } },
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      }),
     });
-    if (error) { toast.error(error.message); return; }
-    toast.success("Check your email to confirm your account.");
-    router.push("/login");
+    const payload = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      toast.error(
+        payload.message || payload.error || "Could not create account"
+      );
+      return;
+    }
+    toast.success("Account created");
+    router.push("/dashboard");
+    router.refresh();
   };
 
   return (

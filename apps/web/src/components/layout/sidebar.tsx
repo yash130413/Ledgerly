@@ -7,7 +7,6 @@ import { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { createClient } from "@/infra/supabase/client";
 import { AnimateList, AnimateItem } from "@/components/shared/motion";
 
 const navItems = [
@@ -39,9 +38,9 @@ function SidebarContent({ email, fullName, onNav }: SidebarProps & { onNav?: () 
   const router = useRouter();
 
   const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
+    router.refresh();
   };
 
   return (
