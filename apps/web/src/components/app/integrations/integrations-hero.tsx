@@ -4,6 +4,7 @@ import { motion, useInView } from "framer-motion";
 import { Activity, Shield, TrendingUp, Zap, type LucideIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/utils";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
 
@@ -16,7 +17,11 @@ function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: strin
     if (!isInView) return;
     let start = 0;
     const end = value;
-    const duration = 1500;
+    if (end === 0) {
+      setCount(0);
+      return;
+    }
+    const duration = 900;
     const increment = end / (duration / 16);
 
     const timer = setInterval(() => {
@@ -32,20 +37,23 @@ function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: strin
     return () => clearInterval(timer);
   }, [isInView, value]);
 
-  return <span ref={ref}>{count}{suffix}</span>;
+  return (
+    <span ref={ref}>
+      {count}
+      {suffix}
+    </span>
+  );
 }
 
 function StatCard({
   icon: Icon,
   label,
-  value,
-  suffix = "",
+  children,
   delay = 0,
 }: {
   icon: LucideIcon;
   label: string;
-  value: number;
-  suffix?: string;
+  children: React.ReactNode;
   delay?: number;
 }) {
   return (
@@ -60,9 +68,7 @@ function StatCard({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-sm text-muted-foreground font-medium mb-2">{label}</p>
-              <p className="text-3xl font-bold tracking-tight">
-                <AnimatedCounter value={value} suffix={suffix} />
-              </p>
+              <p className="text-3xl font-bold tracking-tight tabular-nums">{children}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/10 to-green-600/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <Icon className="w-6 h-6 text-green-600" />
@@ -74,35 +80,63 @@ function StatCard({
   );
 }
 
-function StatusBanner() {
+function StatusBanner({
+  connectedCount,
+}: {
+  connectedCount: number;
+}) {
+  const empty = connectedCount === 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.4, ease: EASE }}
     >
-      <Card hover={false} className="relative overflow-hidden border-green-200/50 bg-gradient-to-r from-green-50/50 to-emerald-50/30">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(34,197,94,0.05),transparent_50%)]" />
+      <Card
+        hover={false}
+        className={
+          empty
+            ? "relative overflow-hidden border-amber-200/60 bg-gradient-to-r from-amber-50/60 to-orange-50/30"
+            : "relative overflow-hidden border-green-200/50 bg-gradient-to-r from-green-50/50 to-emerald-50/30"
+        }
+      >
         <CardContent className="p-4">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <div className="absolute inset-0 w-2 h-2 rounded-full bg-green-500 animate-ping" />
+                <div
+                  className={`w-2 h-2 rounded-full ${empty ? "bg-amber-500" : "bg-green-500"}`}
+                />
+                {!empty && (
+                  <div className="absolute inset-0 w-2 h-2 rounded-full bg-green-500 animate-ping" />
+                )}
               </div>
               <div>
-                <p className="text-sm font-semibold text-green-900">All Systems Operational</p>
-                <p className="text-xs text-green-700/70">Last synced 2 minutes ago</p>
+                <p
+                  className={`text-sm font-semibold ${empty ? "text-amber-900" : "text-green-900"}`}
+                >
+                  {empty ? "No providers connected" : "All systems operational"}
+                </p>
+                <p
+                  className={`text-xs ${empty ? "text-amber-800/70" : "text-green-700/70"}`}
+                >
+                  {empty
+                    ? "Connect a provider below to start monitoring spend"
+                    : `${connectedCount} provider${connectedCount === 1 ? "" : "s"} syncing`}
+                </p>
               </div>
             </div>
-            <div className="flex items-center gap-6 text-xs text-green-800/70">
+            <div
+              className={`flex items-center gap-6 text-xs ${empty ? "text-amber-900/60" : "text-green-800/70"}`}
+            >
               <div className="flex items-center gap-1.5">
                 <Shield className="w-3.5 h-3.5" />
                 <span>Encrypted Storage</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Activity className="w-3.5 h-3.5" />
-                <span>Real-time Monitoring</span>
+                <span>{empty ? "Monitoring idle" : "Live monitoring"}</span>
               </div>
             </div>
           </div>
@@ -112,10 +146,29 @@ function StatusBanner() {
   );
 }
 
-export function IntegrationsHero() {
+export type IntegrationsHeroStats = {
+  connectedCount: number;
+  availableCount: number;
+  activeCount: number;
+  /** Monthly spend monitored via connected providers / latest audit when connected */
+  monthlySpend: number;
+};
+
+export function IntegrationsHero({ stats }: { stats: IntegrationsHeroStats }) {
+  const { connectedCount, availableCount, activeCount, monthlySpend } = stats;
+
+  const healthPercent =
+    connectedCount === 0
+      ? 0
+      : Math.round((activeCount / connectedCount) * 100);
+
+  const coveragePercent =
+    availableCount === 0
+      ? 0
+      : Math.round((connectedCount / availableCount) * 100);
+
   return (
     <div className="flex flex-col gap-8">
-      {/* Hero Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -128,21 +181,28 @@ export function IntegrationsHero() {
             Connected AI Infrastructure
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
-            Monitor, optimize, and manage all AI provider integrations from one secure workspace.
+            Monitor, optimize, and manage all AI provider integrations from one
+            secure workspace.
           </p>
         </div>
       </motion.div>
 
-      {/* Health Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={Zap} label="Connected Providers" value={3} delay={0.1} />
-        <StatCard icon={TrendingUp} label="Monthly Spend Monitored" value={4.8} suffix="k" delay={0.15} />
-        <StatCard icon={Activity} label="Infrastructure Health" value={98} suffix="%" delay={0.2} />
-        <StatCard icon={Shield} label="Optimization Coverage" value={87} suffix="%" delay={0.25} />
+        <StatCard icon={Zap} label="Connected Providers" delay={0.1}>
+          <AnimatedCounter value={connectedCount} />
+        </StatCard>
+        <StatCard icon={TrendingUp} label="Monthly Spend Monitored" delay={0.15}>
+          {formatCurrency(monthlySpend)}
+        </StatCard>
+        <StatCard icon={Activity} label="Infrastructure Health" delay={0.2}>
+          <AnimatedCounter value={healthPercent} suffix="%" />
+        </StatCard>
+        <StatCard icon={Shield} label="Optimization Coverage" delay={0.25}>
+          <AnimatedCounter value={coveragePercent} suffix="%" />
+        </StatCard>
       </div>
 
-      {/* Infrastructure Status Banner */}
-      <StatusBanner />
+      <StatusBanner connectedCount={connectedCount} />
     </div>
   );
 }

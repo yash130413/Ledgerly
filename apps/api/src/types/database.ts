@@ -173,6 +173,7 @@ export interface Database {
           full_name: string | null;
           company_name: string | null;
           role: string;
+          preferences: Json;
           created_at: string;
           updated_at: string;
         };
@@ -182,6 +183,7 @@ export interface Database {
           full_name?: string | null;
           company_name?: string | null;
           role?: string;
+          preferences?: Json;
         };
         Update: {
           email?: string;
@@ -189,6 +191,7 @@ export interface Database {
           full_name?: string | null;
           company_name?: string | null;
           role?: string;
+          preferences?: Json;
           updated_at?: string;
         };
         Relationships: [];

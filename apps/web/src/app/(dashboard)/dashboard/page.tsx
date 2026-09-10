@@ -48,11 +48,17 @@ export default async function DashboardPage() {
     <PageTransition>
       <div className="flex flex-col gap-8">
         <FadeIn delay={0}>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Overview</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {latest.audit.title}
-            </p>
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Overview</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                {latest.audit.title}
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground pb-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              From your latest audit
+            </div>
           </div>
         </FadeIn>
 

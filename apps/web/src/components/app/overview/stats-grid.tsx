@@ -273,29 +273,6 @@ function ActiveProvidersCard({ count, delay = 0 }: { count: number; delay?: numb
   );
 }
 
-// ── Section header ────────────────────────────────────────────────────────────
-
-function SectionHeader() {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: reduce ? 0 : 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: EASE }}
-      className="flex items-end justify-between gap-4"
-    >
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900">Overview</h1>
-        <p className="text-sm text-gray-400 mt-0.5">Your AI spend at a glance</p>
-      </div>
-      <div className="flex items-center gap-1.5 text-xs text-gray-400 pb-0.5">
-        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-        Live · updated just now
-      </div>
-    </motion.div>
-  );
-}
-
 // ── Spend sparkline data (mock trend) ─────────────────────────────────────────
 
 const SPEND_SPARK  = [820, 932, 1100, 980, 1240, 1380, 1820, 1640, 1920, 2100, 1980, 2240];
@@ -306,8 +283,6 @@ const TOKEN_SPARK  = [60, 72, 88, 80, 95, 110, 130, 118, 142, 155, 148, 165];
 export function StatsGrid({ stats }: { stats: DashboardStats }) {
   return (
     <div className="flex flex-col gap-4">
-      <SectionHeader />
-
       {/* Asymmetric grid: hero left + 3 supporting right */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
 

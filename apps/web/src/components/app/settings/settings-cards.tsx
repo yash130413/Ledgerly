@@ -22,6 +22,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { savePreferences, saveProfile } from "@/lib/settings/api";
+import {
+  DEFAULT_PREFERENCES,
+  type UserPreferences,
+} from "@/lib/settings/types";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
 
@@ -142,11 +149,13 @@ function AnimatedSwitch({
 }
 
 function AnimatedSelect({
-  defaultValue,
+  value,
+  onValueChange,
   children,
   className,
 }: {
-  defaultValue: string;
+  value: string;
+  onValueChange: (value: string) => void;
   children: React.ReactNode;
   className?: string;
 }) {
@@ -156,7 +165,12 @@ function AnimatedSelect({
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.15, ease: EASE }}
     >
-      <Select defaultValue={defaultValue}>
+      <Select
+        value={value}
+        onValueChange={(v) => {
+          if (v != null) onValueChange(v);
+        }}
+      >
         <SelectTrigger className={className}>
           <SelectValue />
         </SelectTrigger>
@@ -192,18 +206,36 @@ function AnimatedInput(props: React.ComponentProps<typeof Input>) {
 }
 
 export function ProfileSettingsSection({
-  fullName,
+  fullName: initialName,
   email,
+  companyName: initialCompany = "",
 }: {
   fullName: string;
   email: string;
+  companyName?: string | null;
 }) {
+  const router = useRouter();
+  const [fullName, setFullName] = useState(initialName);
+  const [companyName, setCompanyName] = useState(initialCompany ?? "");
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
+    if (fullName.trim().length < 2) {
+      toast.error("Name must be at least 2 characters");
+      return;
+    }
     setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    const result = await saveProfile({
+      fullName: fullName.trim(),
+      companyName: companyName.trim() || null,
+    });
     setIsSaving(false);
+    if (!result.ok) {
+      toast.error(result.error || "Could not save profile");
+      return;
+    }
+    toast.success("Profile saved");
+    router.refresh();
   };
 
   return (
@@ -217,7 +249,19 @@ export function ProfileSettingsSection({
           <AnimatedInput className="w-56 h-8" value={email} readOnly />
         </SettingRow>
         <SettingRow icon={Globe} label="Full name" description="Displayed across the dashboard">
-          <AnimatedInput className="w-56 h-8" defaultValue={fullName} />
+          <AnimatedInput
+            className="w-56 h-8"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+          />
+        </SettingRow>
+        <SettingRow icon={Globe} label="Company" description="Optional organization name">
+          <AnimatedInput
+            className="w-56 h-8"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            placeholder="Acme Inc."
+          />
         </SettingRow>
       </SettingsCard>
       <SaveBar onSave={handleSave} isSaving={isSaving} />
@@ -225,15 +269,34 @@ export function ProfileSettingsSection({
   );
 }
 
-export function SecuritySettingsSection() {
-  const [twoFactorAuth, setTwoFactorAuth] = useState(false);
-  const [apiEncryption, setApiEncryption] = useState(true);
+export function SecuritySettingsSection({
+  initial,
+}: {
+  initial?: Partial<UserPreferences> | null;
+}) {
+  const router = useRouter();
+  const prefs = { ...DEFAULT_PREFERENCES, ...(initial ?? {}) };
+  const [twoFactorAuth, setTwoFactorAuth] = useState(prefs.twoFactorAuth);
+  const [apiEncryption, setApiEncryption] = useState(prefs.apiEncryption);
+  const [sessionTimeoutMinutes, setSessionTimeoutMinutes] = useState(
+    String(prefs.sessionTimeoutMinutes)
+  );
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
     setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    const result = await savePreferences({
+      twoFactorAuth,
+      apiEncryption,
+      sessionTimeoutMinutes: Number(sessionTimeoutMinutes) as 15 | 30 | 60 | 0,
+    });
     setIsSaving(false);
+    if (!result.ok) {
+      toast.error(result.error || "Could not save security settings");
+      return;
+    }
+    toast.success("Security settings saved");
+    router.refresh();
   };
 
   return (
@@ -262,11 +325,15 @@ export function SecuritySettingsSection() {
           label="Session Timeout"
           description="Auto-logout after period of inactivity"
         >
-          <AnimatedSelect defaultValue="30" className="w-32">
+          <AnimatedSelect
+            value={sessionTimeoutMinutes}
+            onValueChange={setSessionTimeoutMinutes}
+            className="w-32"
+          >
             <SelectItem value="15">15 minutes</SelectItem>
             <SelectItem value="30">30 minutes</SelectItem>
             <SelectItem value="60">1 hour</SelectItem>
-            <SelectItem value="never">Never</SelectItem>
+            <SelectItem value="0">Never</SelectItem>
           </AnimatedSelect>
         </SettingRow>
       </SettingsCard>
@@ -275,18 +342,60 @@ export function SecuritySettingsSection() {
   );
 }
 
-export function PreferencesSettingsSection() {
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [slackNotifications, setSlackNotifications] = useState(false);
-  const [auditAlerts, setAuditAlerts] = useState(true);
-  const [autoOptimization, setAutoOptimization] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+export function PreferencesSettingsSection({
+  initial,
+}: {
+  initial?: Partial<UserPreferences> | null;
+}) {
+  const router = useRouter();
+  const prefs = { ...DEFAULT_PREFERENCES, ...(initial ?? {}) };
+  const [theme, setTheme] = useState(prefs.theme);
+  const [language, setLanguage] = useState(prefs.language);
+  const [darkMode, setDarkMode] = useState(prefs.darkMode);
+  const [auditFrequency, setAuditFrequency] = useState(prefs.auditFrequency);
+  const [auditAlerts, setAuditAlerts] = useState(prefs.auditAlerts);
+  const [dataRetentionDays, setDataRetentionDays] = useState(
+    String(prefs.dataRetentionDays)
+  );
+  const [emailNotifications, setEmailNotifications] = useState(
+    prefs.emailNotifications
+  );
+  const [slackNotifications, setSlackNotifications] = useState(
+    prefs.slackNotifications
+  );
+  const [costAlertUsd, setCostAlertUsd] = useState(String(prefs.costAlertUsd));
+  const [autoOptimization, setAutoOptimization] = useState(prefs.autoOptimization);
+  const [costThresholdUsd, setCostThresholdUsd] = useState(
+    String(prefs.costThresholdUsd)
+  );
+  const [optimizationStrategy, setOptimizationStrategy] = useState(
+    prefs.optimizationStrategy
+  );
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
     setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    const result = await savePreferences({
+      theme,
+      language,
+      darkMode,
+      auditFrequency,
+      auditAlerts,
+      dataRetentionDays: Number(dataRetentionDays) as 30 | 90 | 365,
+      emailNotifications,
+      slackNotifications,
+      costAlertUsd: Number(costAlertUsd) || 0,
+      autoOptimization,
+      costThresholdUsd: Number(costThresholdUsd) || 0,
+      optimizationStrategy,
+    });
     setIsSaving(false);
+    if (!result.ok) {
+      toast.error(result.error || "Could not save preferences");
+      return;
+    }
+    toast.success("Preferences saved");
+    router.refresh();
   };
 
   return (
@@ -297,14 +406,18 @@ export function PreferencesSettingsSection() {
         delay={0.05}
       >
         <SettingRow icon={Palette} label="Theme" description="Choose your preferred color scheme">
-          <AnimatedSelect defaultValue="light" className="w-32">
+          <AnimatedSelect value={theme} onValueChange={(v) => setTheme(v as typeof theme)} className="w-32">
             <SelectItem value="light">Light</SelectItem>
             <SelectItem value="dark">Dark</SelectItem>
             <SelectItem value="system">System</SelectItem>
           </AnimatedSelect>
         </SettingRow>
         <SettingRow icon={Globe} label="Language" description="Select your display language">
-          <AnimatedSelect defaultValue="en" className="w-32">
+          <AnimatedSelect
+            value={language}
+            onValueChange={(v) => setLanguage(v as typeof language)}
+            className="w-32"
+          >
             <SelectItem value="en">English</SelectItem>
             <SelectItem value="es">Spanish</SelectItem>
             <SelectItem value="fr">French</SelectItem>
@@ -329,7 +442,11 @@ export function PreferencesSettingsSection() {
           label="Audit Frequency"
           description="How often to run AI usage audits"
         >
-          <AnimatedSelect defaultValue="daily" className="w-32">
+          <AnimatedSelect
+            value={auditFrequency}
+            onValueChange={(v) => setAuditFrequency(v as typeof auditFrequency)}
+            className="w-32"
+          >
             <SelectItem value="hourly">Hourly</SelectItem>
             <SelectItem value="daily">Daily</SelectItem>
             <SelectItem value="weekly">Weekly</SelectItem>
@@ -347,7 +464,11 @@ export function PreferencesSettingsSection() {
           label="Data Retention"
           description="How long to keep audit history"
         >
-          <AnimatedSelect defaultValue="90" className="w-32">
+          <AnimatedSelect
+            value={dataRetentionDays}
+            onValueChange={setDataRetentionDays}
+            className="w-32"
+          >
             <SelectItem value="30">30 days</SelectItem>
             <SelectItem value="90">90 days</SelectItem>
             <SelectItem value="365">1 year</SelectItem>
@@ -386,7 +507,12 @@ export function PreferencesSettingsSection() {
           description="Notify when spending exceeds threshold"
         >
           <div className="flex items-center gap-2">
-            <AnimatedInput type="number" placeholder="1000" className="w-24 h-8" defaultValue="1000" />
+            <AnimatedInput
+              type="number"
+              className="w-24 h-8"
+              value={costAlertUsd}
+              onChange={(e) => setCostAlertUsd(e.target.value)}
+            />
             <span className="text-sm text-muted-foreground">USD</span>
           </div>
         </SettingRow>
@@ -410,7 +536,12 @@ export function PreferencesSettingsSection() {
           description="Maximum monthly spend per provider"
         >
           <div className="flex items-center gap-2">
-            <AnimatedInput type="number" placeholder="5000" className="w-24 h-8" defaultValue="5000" />
+            <AnimatedInput
+              type="number"
+              className="w-24 h-8"
+              value={costThresholdUsd}
+              onChange={(e) => setCostThresholdUsd(e.target.value)}
+            />
             <span className="text-sm text-muted-foreground">USD</span>
           </div>
         </SettingRow>
@@ -419,7 +550,13 @@ export function PreferencesSettingsSection() {
           label="Optimization Strategy"
           description="Choose your optimization priority"
         >
-          <AnimatedSelect defaultValue="balanced" className="w-32">
+          <AnimatedSelect
+            value={optimizationStrategy}
+            onValueChange={(v) =>
+              setOptimizationStrategy(v as typeof optimizationStrategy)
+            }
+            className="w-32"
+          >
             <SelectItem value="cost">Cost</SelectItem>
             <SelectItem value="balanced">Balanced</SelectItem>
             <SelectItem value="performance">Performance</SelectItem>

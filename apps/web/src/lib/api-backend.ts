@@ -83,13 +83,15 @@ export async function callApiJson(
   const headers = new Headers({ "content-type": "application/json" });
   if (init.token) headers.set("authorization", `Bearer ${init.token}`);
 
+  const method = init.method.toUpperCase();
   try {
     const res = await fetch(`${API_BASE}${path}`, {
-      method: init.method,
+      method,
       headers,
-      body: init.body && init.method !== "GET" && init.method !== "HEAD"
-        ? init.body
-        : undefined,
+      body:
+        init.body && method !== "GET" && method !== "HEAD"
+          ? init.body
+          : undefined,
       cache: "no-store",
     });
     const data = await res.json().catch(() => null);
