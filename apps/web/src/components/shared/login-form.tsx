@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { AnimateList, AnimateItem } from "@/components/shared/motion";
+import { PasswordInput } from "@/components/shared/password-input";
 import { loginSchema, type LoginInput } from "@/lib/validators";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
@@ -68,10 +69,10 @@ export function LoginForm() {
             <AnimateItem>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="password">Password</Label>
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   placeholder="••••••••"
+                  autoComplete="current-password"
                   aria-describedby={errors.password ? "password-error" : undefined}
                   aria-invalid={!!errors.password}
                   {...register("password")}

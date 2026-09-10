@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { PasswordInput } from "@/components/shared/password-input";
 import { signupSchema, type SignupInput } from "@/lib/validators";
 
 export function SignupForm() {
@@ -78,10 +79,10 @@ export function SignupForm() {
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="password">Password</Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               placeholder="••••••••"
+              autoComplete="new-password"
               aria-describedby={errors.password ? "password-error" : undefined}
               aria-invalid={!!errors.password}
               {...register("password")}
@@ -94,10 +95,10 @@ export function SignupForm() {
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="confirmPassword">Confirm password</Label>
-            <Input
+            <PasswordInput
               id="confirmPassword"
-              type="password"
               placeholder="••••••••"
+              autoComplete="new-password"
               aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
               aria-invalid={!!errors.confirmPassword}
               {...register("confirmPassword")}
