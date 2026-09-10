@@ -211,7 +211,7 @@ function MockDashboard() {
           <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/60" />
           <span className="w-2.5 h-2.5 rounded-full bg-green-400/60" />
           <span className="ml-3 h-5 flex-1 max-w-[180px] rounded-lg bg-gray-200/60 text-[10px] text-gray-400 flex items-center px-2.5">
-            app.credex.ai/audits
+            app.localhost:3000/audits
           </span>
         </div>
 
@@ -356,13 +356,13 @@ export function Hero() {
                 <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </Button>
             </Link>
-            <Link href="https://credex-app-six.vercel.app/" target="_blank" rel="noopener noreferrer">
+            <Link href="/audit-form">
               <Button
                 size="lg"
                 variant="outline"
                 className="h-11 px-6 text-sm font-medium rounded-2xl border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all"
               >
-                View Live Demo
+                View Sample Audit
               </Button>
             </Link>
           </motion.div>

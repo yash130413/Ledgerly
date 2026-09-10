@@ -35,13 +35,13 @@ export function CTA() {
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </Button>
               </Link>
-              <Link href="https://credex-app-six.vercel.app/" target="_blank" rel="noopener noreferrer">
+              <Link href="/audit-form">
                 <Button
                   size="lg"
                   variant="outline"
                   className="h-11 px-6 text-sm font-medium rounded-2xl border-green-200 bg-white/60 text-gray-700 hover:bg-white hover:text-gray-900 transition-all"
                 >
-                  View Live Demo
+                  View Sample Audit
                 </Button>
               </Link>
             </div>

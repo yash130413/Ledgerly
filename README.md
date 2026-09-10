@@ -8,13 +8,14 @@
 
 Identify wasted AI software spend, underutilized subscriptions, duplicate tooling, and seat inefficiencies — across ChatGPT, Claude, Cursor, GitHub Copilot, and Gemini.
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-credex--app--six.vercel.app-black?style=flat-square&logo=vercel)](https://credex-app-six.vercel.app/)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](./LICENSE)
 
-[Live Demo](https://credex-app-six.vercel.app/) · [GitHub](https://github.com/yash130413/credex-app.) · [Report a Bug](https://github.com/yash130413/credex-app./issues)
+[GitHub](https://github.com/yash130413/credex-app.) · [Report a Bug](https://github.com/yash130413/credex-app./issues)
+
+> **Deploy status:** production hosting not configured yet. Run locally with `npm run dev`.
 
 </div>
 
@@ -75,7 +76,7 @@ Interactive results page with savings breakdown, priority-based recommendations,
 
 All scores exceed the assignment requirements (Performance ≥ 85, Accessibility ≥ 90, Best Practices ≥ 90).
 
-**Live Demo:** [https://credex-app-six.vercel.app/](https://credex-app-six.vercel.app/)
+Local development: `npm run dev` → [http://localhost:3000](http://localhost:3000)
 
 ---
 
@@ -340,4 +341,4 @@ MIT — see [LICENSE](./LICENSE) for details.
 
 Built by **Yash Rohilla**
 
-[GitHub](https://github.com/yash130413) · [Live Demo](https://credex-app-six.vercel.app/) · [Repository](https://github.com/yash130413/credex-app.)
+[GitHub](https://github.com/yash130413) · [Repository](https://github.com/yash130413/credex-app.)

@@ -21,7 +21,7 @@ const cols = [
     heading: "Project",
     links: [
       { label: "GitHub", href: "https://github.com/yash130413/credex-app." },
-      { label: "Live demo", href: "https://credex-app-six.vercel.app/" },
+      { label: "Start free audit", href: "/audit-form" },
       { label: "Report a bug", href: "https://github.com/yash130413/credex-app./issues" },
     ],
   },

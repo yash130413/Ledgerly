@@ -86,7 +86,7 @@ export function GET() {
             fontSize: "18px",
           }}
         >
-          credex-app-six.vercel.app
+          localhost:3000
         </div>
       </div>
     ),

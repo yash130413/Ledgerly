@@ -8,7 +8,7 @@ import "./globals.css";
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://credex-app-six.vercel.app";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
   title: { default: "Credex — AI Spend Audit", template: "%s | Credex" },

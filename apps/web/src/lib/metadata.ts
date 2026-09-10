@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://credex-app-six.vercel.app';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export const siteMetadata: Metadata = {
   metadataBase: new URL(APP_URL),

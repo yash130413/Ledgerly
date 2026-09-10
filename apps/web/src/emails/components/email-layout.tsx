@@ -39,7 +39,7 @@ export function EmailLayout({ preview, children }: Props) {
           <Section style={styles.footer}>
             <Text style={styles.footerText}>
               You received this email because you used{" "}
-              <Link href={process.env.NEXT_PUBLIC_APP_URL ?? "https://credex.ai"} style={styles.footerLink}>
+              <Link href={process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"} style={styles.footerLink}>
                 Credex
               </Link>
               . We never share your data.

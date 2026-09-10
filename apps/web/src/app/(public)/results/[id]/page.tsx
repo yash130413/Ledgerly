@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Audit Report | Credex" };
   }
 
-  const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://credex-app-six.vercel.app";
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const title = `${audit.title} | Credex Audit Report`;
   const description = `This AI spend audit identified ${audit.recommendations.length} optimization opportunities worth ${formatCurrency(audit.estimated_annual_savings)}/yr in savings.`;
   const url = `${APP_URL}/results/${id}`;
