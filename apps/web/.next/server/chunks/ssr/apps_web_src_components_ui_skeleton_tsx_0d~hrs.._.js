@@ -1,0 +1,3 @@
+module.exports=[52309,a=>{"use strict";var b=a.i(87924),c=a.i(46271),d=a.i(760);a.s(["Skeleton",0,function({className:a,...e}){return(0,b.jsx)(c.motion.div,{"data-slot":"skeleton",initial:{opacity:0},animate:{opacity:1},transition:{duration:.3,ease:"easeOut"},className:(0,d.cn)("relative overflow-hidden rounded-md bg-muted animate-[skeleton-pulse_2s_ease-in-out_infinite]",a),...e,children:(0,b.jsx)("div",{className:"shimmer","aria-hidden":"true"})})}])}];
+
+//# sourceMappingURL=apps_web_src_components_ui_skeleton_tsx_0d~hrs.._.js.map

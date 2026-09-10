@@ -1,0 +1,23 @@
+{
+  "/(auth)/login/page": "/login",
+  "/(auth)/signup/page": "/signup",
+  "/(dashboard)/audits/page": "/audits",
+  "/(dashboard)/dashboard/page": "/dashboard",
+  "/(dashboard)/integrations/page": "/integrations",
+  "/(dashboard)/settings/page": "/settings",
+  "/(public)/audit-form/page": "/audit-form",
+  "/(public)/audit/[shareId]/page": "/audit/[shareId]",
+  "/(public)/results/[id]/page": "/results/[id]",
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/audits/[id]/publish/route": "/api/audits/[id]/publish",
+  "/api/audits/public/route": "/api/audits/public",
+  "/api/audits/route": "/api/audits",
+  "/api/audits/summarize/route": "/api/audits/summarize",
+  "/api/leads/route": "/api/leads",
+  "/favicon.ico/route": "/favicon.ico",
+  "/og-default.png/route": "/og-default.png",
+  "/page": "/",
+  "/robots.txt/route": "/robots.txt",
+  "/sitemap.xml/route": "/sitemap.xml"
+}

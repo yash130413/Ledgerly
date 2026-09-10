@@ -1,0 +1,10 @@
+{
+  "name": "@credex/worker",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo \"worker stub — BullMQ processors land later\"",
+    "build": "echo \"stub\"",
+    "start": "echo \"stub\""
+  }
+}

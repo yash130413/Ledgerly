@@ -1,0 +1,11 @@
+User-Agent: *
+Allow: /
+Allow: /results/
+Allow: /audit/
+Disallow: /dashboard
+Disallow: /audits
+Disallow: /integrations
+Disallow: /settings
+Disallow: /api/
+
+Sitemap: https://credex-app-six.vercel.app/sitemap.xml

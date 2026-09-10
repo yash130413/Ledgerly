@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cd ../.. && npm run build -w @credex/audit-engine && npm run build -w @credex/web",
+  "installCommand": "cd ../.. && npm install",
+  "framework": "nextjs"
+}
