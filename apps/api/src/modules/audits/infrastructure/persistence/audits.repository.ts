@@ -43,6 +43,7 @@ export class AuditsRepository {
         ai_summary: input.aiSummary ?? null,
         is_public: true,
         created_by: input.userId ?? NIL_UUID,
+        workspaces: input.workspaces as unknown as import('../../../../types/database').Json,
       })
       .select('id, share_id')
       .single();
@@ -88,6 +89,32 @@ export class AuditsRepository {
       .order('created_at', { ascending: false });
     if (error) throw error;
     return data ?? [];
+  }
+
+  async getMyLatestAuditWithDetails(userId: string): Promise<{
+    audit: AuditRow;
+    recommendations: AuditRecommendationRow[];
+  } | null> {
+    const { data, error } = await this.supabase
+      .getAdmin()
+      .from('audits')
+      .select('*, audit_recommendations(*)')
+      .eq('created_by', userId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return null;
+
+    const row = data as AuditRow & {
+      audit_recommendations: AuditRecommendationRow[];
+    };
+    const { audit_recommendations, ...audit } = row;
+    return {
+      audit: audit as AuditRow,
+      recommendations: audit_recommendations ?? [],
+    };
   }
 
   async getPublicAuditByShareId(shareId: string): Promise<PublicAuditSafe> {

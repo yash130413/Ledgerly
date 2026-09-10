@@ -87,7 +87,9 @@ export async function callApiJson(
     const res = await fetch(`${API_BASE}${path}`, {
       method: init.method,
       headers,
-      body: init.body,
+      body: init.body && init.method !== "GET" && init.method !== "HEAD"
+        ? init.body
+        : undefined,
       cache: "no-store",
     });
     const data = await res.json().catch(() => null);

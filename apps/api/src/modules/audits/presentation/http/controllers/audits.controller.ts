@@ -70,6 +70,12 @@ export class AuditsController {
     return this.audits.listMine(req.user!.id);
   }
 
+  @Get('me/latest')
+  @UseGuards(AuthGuard)
+  latestMine(@Req() req: AuthedRequest) {
+    return this.audits.getLatestMine(req.user!.id);
+  }
+
   @Get('public/:shareId')
   getPublic(@Param('shareId') shareId: string) {
     return this.audits.getPublicByShareId(shareId);

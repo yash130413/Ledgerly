@@ -37,6 +37,7 @@ export interface Database {
           is_public: boolean;
           created_by: string;
           created_at: string;
+          workspaces: Json | null;
         };
         Insert: {
           organization_id: string;
@@ -51,6 +52,7 @@ export interface Database {
           ai_summary?: string | null;
           is_public: boolean;
           created_by: string;
+          workspaces?: Json | null;
         };
         Update: {
           organization_id?: string;
@@ -65,6 +67,7 @@ export interface Database {
           ai_summary?: string | null;
           is_public?: boolean;
           created_by?: string;
+          workspaces?: Json | null;
         };
         Relationships: [];
       };

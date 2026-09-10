@@ -1,13 +1,33 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { AuditResultsDashboard } from "@/components/app/audits/audit-results-dashboard";
 import { PageTransition, FadeIn } from "@/components/shared/motion";
-import { mockWorkspaces } from "@/modules/audits/fixtures/mock-workspaces";
-import { runAuditEngine } from "@ledgerly/audit-engine";
+import { fetchLatestAudit } from "@/lib/audits/latest";
 
 export const metadata: Metadata = { title: "Audit Results" };
+export const dynamic = "force-dynamic";
 
-export default function AuditsPage() {
-  const result = runAuditEngine(mockWorkspaces);
+export default async function AuditsPage() {
+  const latest = await fetchLatestAudit();
+
+  if (!latest) {
+    return (
+      <PageTransition>
+        <div className="flex flex-col items-start gap-4 py-12">
+          <h1 className="text-2xl font-bold tracking-tight">No audit results</h1>
+          <p className="text-sm text-muted-foreground">
+            Seeded or live audits for your account will show up here.
+          </p>
+          <Link href="/audit-form">
+            <Button>Run an audit</Button>
+          </Link>
+        </div>
+      </PageTransition>
+    );
+  }
+
+  const { result, workspaces, audit } = latest;
 
   return (
     <PageTransition>
@@ -17,7 +37,7 @@ export default function AuditsPage() {
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Audit Results</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Deterministic rule-based analysis ·{" "}
+                {audit.title} ·{" "}
                 {new Date(result.generatedAt).toLocaleString("en-US", {
                   month: "short",
                   day: "numeric",
@@ -29,13 +49,15 @@ export default function AuditsPage() {
             </div>
             <div className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/[0.07]">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-medium text-emerald-400">Audit complete</span>
+              <span className="text-xs font-medium text-emerald-400">
+                From your account
+              </span>
             </div>
           </div>
         </FadeIn>
 
         <FadeIn delay={0.08}>
-          <AuditResultsDashboard result={result} workspaces={mockWorkspaces} />
+          <AuditResultsDashboard result={result} workspaces={workspaces} />
         </FadeIn>
       </div>
     </PageTransition>

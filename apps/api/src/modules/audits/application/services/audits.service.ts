@@ -8,6 +8,7 @@ import {
   mapWorkspacesToEngine,
   runAuditEngine,
   type AuditEngineResult,
+  type WorkspaceMetrics,
 } from '@ledgerly/audit-engine';
 import { AiService } from '../../../../infra/ai/ai.service';
 import { MailService } from '../../../../infra/mail/mail.service';
@@ -125,6 +126,56 @@ export class AuditsService {
 
   listMine(userId: string) {
     return this.repo.getMyAudits(userId);
+  }
+
+  async getLatestMine(userId: string) {
+    const packed = await this.repo.getMyLatestAuditWithDetails(userId);
+    if (!packed) return null;
+
+    const { audit, recommendations } = packed;
+    const workspaces = (audit.workspaces as unknown as WorkspaceMetrics[]) ?? [];
+    const result: AuditEngineResult = {
+      recommendations: recommendations.map((r) => ({
+        id: r.id,
+        provider: r.provider as AuditEngineResult['recommendations'][number]['provider'],
+        title: r.title,
+        recommendation: r.recommendation,
+        reason: r.reason,
+        confidenceScore: r.confidence_score,
+        priority: r.priority,
+        monthlySavings: Number(r.monthly_savings),
+        annualSavings: Number(r.annual_savings),
+        affectedUsers: r.affected_users,
+        ruleId: r.rule_id,
+      })),
+      totalMonthlySavings: Number(audit.estimated_monthly_savings),
+      totalAnnualSavings: Number(audit.estimated_annual_savings),
+      totalCurrentSpend: Number(audit.total_monthly_spend),
+      criticalCount: recommendations.filter((r) => r.priority === 'Critical').length,
+      highCount: recommendations.filter((r) => r.priority === 'High').length,
+      providersScanned: [
+        ...new Set(
+          recommendations.map(
+            (r) => r.provider as AuditEngineResult['recommendations'][number]['provider'],
+          ),
+        ),
+      ],
+      optimizationScore: audit.optimization_score,
+      generatedAt: audit.created_at,
+    };
+
+    return {
+      audit: {
+        id: audit.id,
+        title: audit.title,
+        shareId: audit.share_id,
+        isPublic: audit.is_public,
+        createdAt: audit.created_at,
+        aiSummary: audit.ai_summary,
+      },
+      workspaces,
+      result,
+    };
   }
 
   getPublicByShareId(shareId: string) {
