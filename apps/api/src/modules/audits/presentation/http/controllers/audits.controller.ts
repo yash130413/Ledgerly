@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Headers,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -74,6 +75,14 @@ export class AuditsController {
   @UseGuards(AuthGuard)
   latestMine(@Req() req: AuthedRequest) {
     return this.audits.getLatestMine(req.user!.id);
+  }
+
+  @Get('me/:id')
+  @UseGuards(AuthGuard)
+  async mineById(@Req() req: AuthedRequest, @Param('id') id: string) {
+    const detail = await this.audits.getMineById(req.user!.id, id);
+    if (!detail) throw new NotFoundException('Audit not found');
+    return detail;
   }
 
   @Get('public/:shareId')

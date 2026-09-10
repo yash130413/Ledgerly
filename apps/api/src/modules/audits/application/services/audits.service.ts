@@ -14,6 +14,10 @@ import { AiService } from '../../../../infra/ai/ai.service';
 import { MailService } from '../../../../infra/mail/mail.service';
 import { AuditsRepository } from '../../infrastructure/persistence/audits.repository';
 import type { CreateAuditDto, PublicAuditDto, SummarizeAuditDto } from '../../presentation/http/dto/audits.dto';
+import type {
+  AuditRecommendationRow,
+  AuditRow,
+} from '../../../../types/database';
 
 const NIL_UUID = '00000000-0000-0000-0000-000000000000';
 
@@ -128,12 +132,12 @@ export class AuditsService {
     return this.repo.getMyAudits(userId);
   }
 
-  async getLatestMine(userId: string) {
-    const packed = await this.repo.getMyLatestAuditWithDetails(userId);
-    if (!packed) return null;
-
-    const { audit, recommendations } = packed;
-    const workspaces = (audit.workspaces as unknown as WorkspaceMetrics[]) ?? [];
+  private toDetailPayload(packed: {
+    audit: AuditRow;
+    recommendations: AuditRecommendationRow[];
+  }) {
+    const { audit: row, recommendations } = packed;
+    const workspaces = (row.workspaces as unknown as WorkspaceMetrics[]) ?? [];
     const result: AuditEngineResult = {
       recommendations: recommendations.map((r) => ({
         id: r.id,
@@ -148,9 +152,9 @@ export class AuditsService {
         affectedUsers: r.affected_users,
         ruleId: r.rule_id,
       })),
-      totalMonthlySavings: Number(audit.estimated_monthly_savings),
-      totalAnnualSavings: Number(audit.estimated_annual_savings),
-      totalCurrentSpend: Number(audit.total_monthly_spend),
+      totalMonthlySavings: Number(row.estimated_monthly_savings),
+      totalAnnualSavings: Number(row.estimated_annual_savings),
+      totalCurrentSpend: Number(row.total_monthly_spend),
       criticalCount: recommendations.filter((r) => r.priority === 'Critical').length,
       highCount: recommendations.filter((r) => r.priority === 'High').length,
       providersScanned: [
@@ -160,22 +164,37 @@ export class AuditsService {
           ),
         ),
       ],
-      optimizationScore: audit.optimization_score,
-      generatedAt: audit.created_at,
+      optimizationScore: row.optimization_score,
+      generatedAt: row.created_at,
     };
 
     return {
       audit: {
-        id: audit.id,
-        title: audit.title,
-        shareId: audit.share_id,
-        isPublic: audit.is_public,
-        createdAt: audit.created_at,
-        aiSummary: audit.ai_summary,
+        id: row.id,
+        title: row.title,
+        shareId: row.share_id,
+        isPublic: row.is_public,
+        createdAt: row.created_at,
+        aiSummary: row.ai_summary,
+        optimizationScore: row.optimization_score,
+        estimatedMonthlySavings: Number(row.estimated_monthly_savings),
+        totalMonthlySpend: Number(row.total_monthly_spend),
       },
       workspaces,
       result,
     };
+  }
+
+  async getLatestMine(userId: string) {
+    const packed = await this.repo.getMyLatestAuditWithDetails(userId);
+    if (!packed) return null;
+    return this.toDetailPayload(packed);
+  }
+
+  async getMineById(userId: string, auditId: string) {
+    const packed = await this.repo.getMyAuditWithDetails(userId, auditId);
+    if (!packed) return null;
+    return this.toDetailPayload(packed);
   }
 
   getPublicByShareId(shareId: string) {

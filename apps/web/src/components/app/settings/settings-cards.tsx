@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import {
   Bell,
@@ -191,147 +191,57 @@ function AnimatedInput(props: React.ComponentProps<typeof Input>) {
   );
 }
 
-export function SettingsCards() {
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [slackNotifications, setSlackNotifications] = useState(false);
-  const [auditAlerts, setAuditAlerts] = useState(true);
-  const [autoOptimization, setAutoOptimization] = useState(true);
-  const [twoFactorAuth, setTwoFactorAuth] = useState(false);
-  const [apiEncryption, setApiEncryption] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+export function ProfileSettingsSection({
+  fullName,
+  email,
+}: {
+  fullName: string;
+  email: string;
+}) {
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
     setIsSaving(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 800));
     setIsSaving(false);
   };
 
   return (
     <div className="space-y-6">
-      {/* Workspace Preferences */}
       <SettingsCard
-        title="Workspace Preferences"
-        description="Customize your workspace appearance and behavior"
-        delay={0.1}
+        title="Profile"
+        description="Your account identity on Ledgerly"
+        delay={0.05}
       >
-        <SettingRow
-          icon={Palette}
-          label="Theme"
-          description="Choose your preferred color scheme"
-        >
-          <AnimatedSelect defaultValue="light" className="w-32">
-            <SelectItem value="light">Light</SelectItem>
-            <SelectItem value="dark">Dark</SelectItem>
-            <SelectItem value="system">System</SelectItem>
-          </AnimatedSelect>
+        <SettingRow icon={Mail} label="Email" description="Sign-in email (read-only for now)">
+          <AnimatedInput className="w-56 h-8" value={email} readOnly />
         </SettingRow>
-
-        <SettingRow
-          icon={Globe}
-          label="Language"
-          description="Select your display language"
-        >
-          <AnimatedSelect defaultValue="en" className="w-32">
-            <SelectItem value="en">English</SelectItem>
-            <SelectItem value="es">Spanish</SelectItem>
-            <SelectItem value="fr">French</SelectItem>
-          </AnimatedSelect>
-        </SettingRow>
-
-        <SettingRow
-          icon={Palette}
-          label="Dark Mode"
-          description="Enable dark mode for reduced eye strain"
-        >
-          <AnimatedSwitch checked={darkMode} onCheckedChange={setDarkMode} />
+        <SettingRow icon={Globe} label="Full name" description="Displayed across the dashboard">
+          <AnimatedInput className="w-56 h-8" defaultValue={fullName} />
         </SettingRow>
       </SettingsCard>
+      <SaveBar onSave={handleSave} isSaving={isSaving} />
+    </div>
+  );
+}
 
-      {/* AI Audit Settings */}
-      <SettingsCard
-        title="AI Audit Settings"
-        description="Configure audit frequency and monitoring preferences"
-        delay={0.15}
-      >
-        <SettingRow
-          icon={Settings2}
-          label="Audit Frequency"
-          description="How often to run AI usage audits"
-        >
-          <AnimatedSelect defaultValue="daily" className="w-32">
-            <SelectItem value="hourly">Hourly</SelectItem>
-            <SelectItem value="daily">Daily</SelectItem>
-            <SelectItem value="weekly">Weekly</SelectItem>
-          </AnimatedSelect>
-        </SettingRow>
+export function SecuritySettingsSection() {
+  const [twoFactorAuth, setTwoFactorAuth] = useState(false);
+  const [apiEncryption, setApiEncryption] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-        <SettingRow
-          icon={Bell}
-          label="Audit Alerts"
-          description="Receive notifications when audits complete"
-        >
-          <AnimatedSwitch checked={auditAlerts} onCheckedChange={setAuditAlerts} />
-        </SettingRow>
+  const handleSave = async () => {
+    setIsSaving(true);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    setIsSaving(false);
+  };
 
-        <SettingRow
-          icon={TrendingUp}
-          label="Data Retention"
-          description="How long to keep audit history"
-        >
-          <AnimatedSelect defaultValue="90" className="w-32">
-            <SelectItem value="30">30 days</SelectItem>
-            <SelectItem value="90">90 days</SelectItem>
-            <SelectItem value="365">1 year</SelectItem>
-          </AnimatedSelect>
-        </SettingRow>
-      </SettingsCard>
-
-      {/* Notifications */}
-      <SettingsCard
-        title="Notifications"
-        description="Manage how you receive updates and alerts"
-        delay={0.2}
-      >
-        <SettingRow
-          icon={Mail}
-          label="Email Notifications"
-          description="Receive updates via email"
-        >
-          <AnimatedSwitch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
-        </SettingRow>
-
-        <SettingRow
-          icon={MessageSquare}
-          label="Slack Integration"
-          description="Send alerts to your Slack workspace"
-        >
-          <AnimatedSwitch checked={slackNotifications} onCheckedChange={setSlackNotifications} />
-        </SettingRow>
-
-        <SettingRow
-          icon={Bell}
-          label="Cost Alerts"
-          description="Notify when spending exceeds threshold"
-        >
-          <div className="flex items-center gap-2">
-            <AnimatedInput
-              type="number"
-              placeholder="1000"
-              className="w-24 h-8"
-              defaultValue="1000"
-            />
-            <span className="text-sm text-muted-foreground">USD</span>
-          </div>
-        </SettingRow>
-      </SettingsCard>
-
-      {/* Security & Privacy */}
+  return (
+    <div className="space-y-6">
       <SettingsCard
         title="Security & Privacy"
         description="Protect your workspace and manage data access"
-        delay={0.25}
+        delay={0.05}
       >
         <SettingRow
           icon={Shield}
@@ -340,7 +250,6 @@ export function SettingsCards() {
         >
           <AnimatedSwitch checked={twoFactorAuth} onCheckedChange={setTwoFactorAuth} />
         </SettingRow>
-
         <SettingRow
           icon={Lock}
           label="API Key Encryption"
@@ -348,7 +257,6 @@ export function SettingsCards() {
         >
           <AnimatedSwitch checked={apiEncryption} onCheckedChange={setApiEncryption} />
         </SettingRow>
-
         <SettingRow
           icon={Shield}
           label="Session Timeout"
@@ -362,12 +270,132 @@ export function SettingsCards() {
           </AnimatedSelect>
         </SettingRow>
       </SettingsCard>
+      <SaveBar onSave={handleSave} isSaving={isSaving} />
+    </div>
+  );
+}
 
-      {/* Optimization Controls */}
+export function PreferencesSettingsSection() {
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [slackNotifications, setSlackNotifications] = useState(false);
+  const [auditAlerts, setAuditAlerts] = useState(true);
+  const [autoOptimization, setAutoOptimization] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    setIsSaving(false);
+  };
+
+  return (
+    <div className="space-y-6">
+      <SettingsCard
+        title="Workspace Preferences"
+        description="Customize your workspace appearance and behavior"
+        delay={0.05}
+      >
+        <SettingRow icon={Palette} label="Theme" description="Choose your preferred color scheme">
+          <AnimatedSelect defaultValue="light" className="w-32">
+            <SelectItem value="light">Light</SelectItem>
+            <SelectItem value="dark">Dark</SelectItem>
+            <SelectItem value="system">System</SelectItem>
+          </AnimatedSelect>
+        </SettingRow>
+        <SettingRow icon={Globe} label="Language" description="Select your display language">
+          <AnimatedSelect defaultValue="en" className="w-32">
+            <SelectItem value="en">English</SelectItem>
+            <SelectItem value="es">Spanish</SelectItem>
+            <SelectItem value="fr">French</SelectItem>
+          </AnimatedSelect>
+        </SettingRow>
+        <SettingRow
+          icon={Palette}
+          label="Dark Mode"
+          description="Enable dark mode for reduced eye strain"
+        >
+          <AnimatedSwitch checked={darkMode} onCheckedChange={setDarkMode} />
+        </SettingRow>
+      </SettingsCard>
+
+      <SettingsCard
+        title="AI Audit Settings"
+        description="Configure audit frequency and monitoring preferences"
+        delay={0.1}
+      >
+        <SettingRow
+          icon={Settings2}
+          label="Audit Frequency"
+          description="How often to run AI usage audits"
+        >
+          <AnimatedSelect defaultValue="daily" className="w-32">
+            <SelectItem value="hourly">Hourly</SelectItem>
+            <SelectItem value="daily">Daily</SelectItem>
+            <SelectItem value="weekly">Weekly</SelectItem>
+          </AnimatedSelect>
+        </SettingRow>
+        <SettingRow
+          icon={Bell}
+          label="Audit Alerts"
+          description="Receive notifications when audits complete"
+        >
+          <AnimatedSwitch checked={auditAlerts} onCheckedChange={setAuditAlerts} />
+        </SettingRow>
+        <SettingRow
+          icon={TrendingUp}
+          label="Data Retention"
+          description="How long to keep audit history"
+        >
+          <AnimatedSelect defaultValue="90" className="w-32">
+            <SelectItem value="30">30 days</SelectItem>
+            <SelectItem value="90">90 days</SelectItem>
+            <SelectItem value="365">1 year</SelectItem>
+          </AnimatedSelect>
+        </SettingRow>
+      </SettingsCard>
+
+      <SettingsCard
+        title="Notifications"
+        description="Manage how you receive updates and alerts"
+        delay={0.15}
+      >
+        <SettingRow
+          icon={Mail}
+          label="Email Notifications"
+          description="Receive updates via email"
+        >
+          <AnimatedSwitch
+            checked={emailNotifications}
+            onCheckedChange={setEmailNotifications}
+          />
+        </SettingRow>
+        <SettingRow
+          icon={MessageSquare}
+          label="Slack Integration"
+          description="Send alerts to your Slack workspace"
+        >
+          <AnimatedSwitch
+            checked={slackNotifications}
+            onCheckedChange={setSlackNotifications}
+          />
+        </SettingRow>
+        <SettingRow
+          icon={Bell}
+          label="Cost Alerts"
+          description="Notify when spending exceeds threshold"
+        >
+          <div className="flex items-center gap-2">
+            <AnimatedInput type="number" placeholder="1000" className="w-24 h-8" defaultValue="1000" />
+            <span className="text-sm text-muted-foreground">USD</span>
+          </div>
+        </SettingRow>
+      </SettingsCard>
+
       <SettingsCard
         title="Optimization Controls"
         description="Configure AI cost optimization and performance settings"
-        delay={0.3}
+        delay={0.2}
       >
         <SettingRow
           icon={Zap}
@@ -376,23 +404,16 @@ export function SettingsCards() {
         >
           <AnimatedSwitch checked={autoOptimization} onCheckedChange={setAutoOptimization} />
         </SettingRow>
-
         <SettingRow
           icon={TrendingUp}
           label="Cost Threshold"
           description="Maximum monthly spend per provider"
         >
           <div className="flex items-center gap-2">
-            <AnimatedInput
-              type="number"
-              placeholder="5000"
-              className="w-24 h-8"
-              defaultValue="5000"
-            />
+            <AnimatedInput type="number" placeholder="5000" className="w-24 h-8" defaultValue="5000" />
             <span className="text-sm text-muted-foreground">USD</span>
           </div>
         </SettingRow>
-
         <SettingRow
           icon={Settings2}
           label="Optimization Strategy"
@@ -406,59 +427,34 @@ export function SettingsCards() {
         </SettingRow>
       </SettingsCard>
 
-      {/* Save Button */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.4, ease: EASE }}
-        className="flex justify-end pt-2"
-      >
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.15, ease: EASE }}
-        >
-          <Button
-            size="sm"
-            className="gap-2 relative overflow-hidden"
-            onClick={handleSave}
-            disabled={isSaving}
-          >
-            <AnimatePresence mode="wait">
-              {isSaving ? (
-                <motion.div
-                  key="saving"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex items-center gap-2"
-                >
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  >
-                    <Settings2 className="w-4 h-4" />
-                  </motion.div>
-                  Saving...
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="save"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex items-center gap-2"
-                >
-                  <Settings2 className="w-4 h-4" />
-                  Save Changes
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </Button>
-        </motion.div>
-      </motion.div>
+      <SaveBar onSave={handleSave} isSaving={isSaving} />
     </div>
   );
+}
+
+function SaveBar({
+  onSave,
+  isSaving,
+}: {
+  onSave: () => void;
+  isSaving: boolean;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4, ease: EASE }}
+      className="flex justify-end pt-2"
+    >
+      <Button size="sm" className="gap-2" onClick={onSave} disabled={isSaving}>
+        <Settings2 className={cn("w-4 h-4", isSaving && "animate-spin")} />
+        {isSaving ? "Saving…" : "Save Changes"}
+      </Button>
+    </motion.div>
+  );
+}
+
+/** @deprecated Prefer section components on settings sub-routes */
+export function SettingsCards() {
+  return <PreferencesSettingsSection />;
 }

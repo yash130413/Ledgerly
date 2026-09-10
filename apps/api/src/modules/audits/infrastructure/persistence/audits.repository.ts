@@ -117,6 +117,34 @@ export class AuditsRepository {
     };
   }
 
+  async getMyAuditWithDetails(
+    userId: string,
+    auditId: string,
+  ): Promise<{
+    audit: AuditRow;
+    recommendations: AuditRecommendationRow[];
+  } | null> {
+    const { data, error } = await this.supabase
+      .getAdmin()
+      .from('audits')
+      .select('*, audit_recommendations(*)')
+      .eq('created_by', userId)
+      .eq('id', auditId)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return null;
+
+    const row = data as AuditRow & {
+      audit_recommendations: AuditRecommendationRow[];
+    };
+    const { audit_recommendations, ...audit } = row;
+    return {
+      audit: audit as AuditRow,
+      recommendations: audit_recommendations ?? [],
+    };
+  }
+
   async getPublicAuditByShareId(shareId: string): Promise<PublicAuditSafe> {
     const { data, error } = await this.supabase
       .getAdmin()

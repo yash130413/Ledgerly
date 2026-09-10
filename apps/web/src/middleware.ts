@@ -6,6 +6,7 @@ export async function middleware(request: NextRequest) {
   const isDashboard =
     request.nextUrl.pathname.startsWith("/dashboard") ||
     request.nextUrl.pathname.startsWith("/audits") ||
+    request.nextUrl.pathname.startsWith("/recommendations") ||
     request.nextUrl.pathname.startsWith("/integrations") ||
     request.nextUrl.pathname.startsWith("/settings");
 

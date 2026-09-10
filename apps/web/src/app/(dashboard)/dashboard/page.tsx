@@ -9,6 +9,7 @@ import { RecommendationCard } from "@/components/app/overview/recommendation-car
 import { PageTransition, FadeIn } from "@/components/shared/motion";
 import {
   fetchLatestAudit,
+  fetchMyAudits,
   spendChartFromWorkspaces,
   statsFromAudit,
 } from "@/lib/audits/latest";
@@ -17,7 +18,10 @@ export const metadata: Metadata = { title: "Dashboard" };
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const latest = await fetchLatestAudit();
+  const [latest, audits] = await Promise.all([
+    fetchLatestAudit(),
+    fetchMyAudits(),
+  ]);
 
   if (!latest) {
     return (
@@ -37,7 +41,7 @@ export default async function DashboardPage() {
 
   const { result } = latest;
   const topRecs = result.recommendations.slice(0, 3);
-  const stats = statsFromAudit(latest, 1);
+  const stats = statsFromAudit(latest, audits.length || 1);
   const spendChart = spendChartFromWorkspaces(latest.workspaces);
 
   return (
@@ -45,7 +49,7 @@ export default async function DashboardPage() {
       <div className="flex flex-col gap-8">
         <FadeIn delay={0}>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Overview</h1>
             <p className="text-sm text-muted-foreground mt-1">
               {latest.audit.title}
             </p>
@@ -64,21 +68,24 @@ export default async function DashboardPage() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-base font-semibold">Latest Audit Snapshot</h2>
+                <h2 className="text-base font-semibold">Latest snapshot</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {result.recommendations.length} findings across{" "}
+                  {result.recommendations.length} findings ·{" "}
                   {result.providersScanned.length} providers
                 </p>
               </div>
-              <Link href="/audits">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-1.5 text-muted-foreground hover:text-foreground"
-                >
-                  Full results <ArrowRight className="w-3.5 h-3.5" />
-                </Button>
-              </Link>
+              <div className="flex items-center gap-1">
+                <Link href={`/audits/${latest.audit.id}`}>
+                  <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
+                    Full audit <ArrowRight className="w-3.5 h-3.5" />
+                  </Button>
+                </Link>
+                <Link href="/recommendations">
+                  <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
+                    All tips <ArrowRight className="w-3.5 h-3.5" />
+                  </Button>
+                </Link>
+              </div>
             </div>
 
             <AuditHeroStats result={result} />
@@ -90,7 +97,7 @@ export default async function DashboardPage() {
             </div>
 
             {result.recommendations.length > 3 && (
-              <Link href="/audits" className="self-start">
+              <Link href="/recommendations" className="self-start">
                 <Button variant="outline" size="sm" className="gap-1.5">
                   View all {result.recommendations.length} recommendations
                   <ArrowRight className="w-3.5 h-3.5" />

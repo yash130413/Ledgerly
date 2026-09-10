@@ -1,35 +1,52 @@
 import { Injectable } from '@nestjs/common';
 
-const mockProviders = [
+/** Available providers users can connect — none connected until OAuth lands. */
+const AVAILABLE = [
   {
-    id: '1',
-    name: 'OpenAI Production',
+    id: 'openai',
+    name: 'OpenAI / ChatGPT',
     provider: 'openai' as const,
-    apiKeyMasked: 'sk-••••••••abcd',
-    isActive: true,
-    connectedAt: '2026-01-12T10:00:00Z',
+    description: 'Read usage and seat data from your OpenAI org.',
   },
   {
-    id: '2',
+    id: 'anthropic',
     name: 'Anthropic Claude',
     provider: 'anthropic' as const,
-    apiKeyMasked: 'sk-ant-••••••••wxyz',
-    isActive: true,
-    connectedAt: '2026-02-03T14:30:00Z',
+    description: 'Connect Claude Team / API billing for seat audits.',
   },
   {
-    id: '3',
-    name: 'Gemini Workspace',
+    id: 'gemini',
+    name: 'Google Gemini',
     provider: 'gemini' as const,
-    apiKeyMasked: 'AIza••••••••1234',
-    isActive: false,
-    connectedAt: '2026-03-01T09:15:00Z',
+    description: 'Pull Gemini Workspace and API spend signals.',
+  },
+  {
+    id: 'cursor',
+    name: 'Cursor',
+    provider: 'custom' as const,
+    description: 'Track Cursor Pro seat utilization (coming soon).',
+  },
+  {
+    id: 'copilot',
+    name: 'GitHub Copilot',
+    provider: 'custom' as const,
+    description: 'Import Copilot Business seat activity (coming soon).',
   },
 ];
 
 @Injectable()
 export class IntegrationsService {
   listForUser(_userId: string) {
-    return mockProviders;
+    return {
+      connected: [] as Array<{
+        id: string;
+        name: string;
+        provider: string;
+        apiKeyMasked: string;
+        isActive: boolean;
+        connectedAt: string;
+      }>,
+      available: AVAILABLE,
+    };
   }
 }

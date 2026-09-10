@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, Zap, Plug, Settings, LogOut, Menu, X } from "lucide-react";
+import { BarChart3, Zap, Lightbulb, Plug, Settings, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -11,10 +11,11 @@ import { AnimateList, AnimateItem } from "@/components/shared/motion";
 import { LedgerlyLogo } from "@/components/brand/ledgerly-logo";
 
 const navItems = [
-  { href: "/dashboard",    label: "Overview",      icon: BarChart3 },
-  { href: "/audits",       label: "Audit Results", icon: Zap },
-  { href: "/integrations", label: "Integrations",  icon: Plug },
-  { href: "/settings",     label: "Settings",      icon: Settings },
+  { href: "/dashboard", label: "Overview", icon: BarChart3 },
+  { href: "/audits", label: "Audits", icon: Zap },
+  { href: "/recommendations", label: "Recommendations", icon: Lightbulb },
+  { href: "/integrations", label: "Integrations", icon: Plug },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;

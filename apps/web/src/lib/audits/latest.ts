@@ -6,7 +6,7 @@ import type {
 } from "@ledgerly/audit-engine";
 import type { DashboardStats, SpendChartData } from "@/types";
 
-export type LatestAuditPayload = {
+export type AuditDetailPayload = {
   audit: {
     id: string;
     title: string;
@@ -14,13 +14,36 @@ export type LatestAuditPayload = {
     isPublic: boolean;
     createdAt: string;
     aiSummary: string | null;
+    optimizationScore?: number;
+    estimatedMonthlySavings?: number;
+    totalMonthlySpend?: number;
   };
   workspaces: WorkspaceMetrics[];
   result: AuditEngineResult;
 };
 
-export async function fetchLatestAudit(): Promise<LatestAuditPayload | null> {
+/** @deprecated use AuditDetailPayload */
+export type LatestAuditPayload = AuditDetailPayload;
+
+export type AuditListItem = {
+  id: string;
+  title: string;
+  provider: string;
+  created_at: string;
+  optimization_score: number;
+  estimated_monthly_savings: number;
+  total_monthly_spend: number;
+  is_public: boolean;
+  share_id: string;
+};
+
+async function withToken() {
   const token = await getAccessToken();
+  return token;
+}
+
+export async function fetchLatestAudit(): Promise<AuditDetailPayload | null> {
+  const token = await withToken();
   if (!token) return null;
 
   const { ok, data } = await callApiJson("/api/audits/me/latest", {
@@ -29,11 +52,39 @@ export async function fetchLatestAudit(): Promise<LatestAuditPayload | null> {
   });
 
   if (!ok || !data) return null;
-  return data as LatestAuditPayload;
+  return data as AuditDetailPayload;
+}
+
+export async function fetchMyAudits(): Promise<AuditListItem[]> {
+  const token = await withToken();
+  if (!token) return [];
+
+  const { ok, data } = await callApiJson("/api/audits/me", {
+    method: "GET",
+    token,
+  });
+
+  if (!ok || !Array.isArray(data)) return [];
+  return data as AuditListItem[];
+}
+
+export async function fetchAuditById(
+  id: string
+): Promise<AuditDetailPayload | null> {
+  const token = await withToken();
+  if (!token) return null;
+
+  const { ok, status, data } = await callApiJson(`/api/audits/me/${id}`, {
+    method: "GET",
+    token,
+  });
+
+  if (!ok || status === 404 || !data) return null;
+  return data as AuditDetailPayload;
 }
 
 export function statsFromAudit(
-  payload: LatestAuditPayload,
+  payload: AuditDetailPayload,
   auditsRun: number
 ): DashboardStats {
   const { result, workspaces } = payload;
@@ -51,7 +102,6 @@ export function statsFromAudit(
   };
 }
 
-/** Build a simple current-month spend chart from workspace providers (no fake history). */
 export function spendChartFromWorkspaces(
   workspaces: WorkspaceMetrics[]
 ): SpendChartData[] {
