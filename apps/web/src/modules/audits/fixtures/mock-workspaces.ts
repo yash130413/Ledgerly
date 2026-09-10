@@ -1,4 +1,4 @@
-import type { WorkspaceMetrics } from "@credex/audit-engine";
+import type { WorkspaceMetrics } from "@ledgerly/audit-engine";
 
 // Each fixture is tuned to trigger specific rules while remaining believable
 // for a mid-market engineering org (~80 seats total across tools)

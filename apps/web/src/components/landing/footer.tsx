@@ -40,7 +40,7 @@ export function Footer() {
                   <path d="M2 7h4M8 7h4M7 2v4M7 8v4" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
                 </svg>
               </span>
-              <span className="font-semibold text-[15px] tracking-tight text-gray-900">Credex</span>
+              <span className="font-semibold text-[15px] tracking-tight text-gray-900">Ledgerly</span>
             </Link>
             <p className="text-sm text-gray-500 leading-relaxed max-w-[220px]">
               AI spend auditing for engineering teams. Open source, built with Next.js.
@@ -87,7 +87,7 @@ export function Footer() {
 
         <div className="border-t border-gray-100 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-gray-400">
-            © {new Date().getFullYear()} Credex. Built by{" "}
+            © {new Date().getFullYear()} Ledgerly. Built by{" "}
             <Link
               href="https://github.com/yash130413"
               className="hover:text-gray-700 transition-colors underline underline-offset-2"

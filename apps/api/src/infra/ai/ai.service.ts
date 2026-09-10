@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Anthropic from '@anthropic-ai/sdk';
-import type { AuditEngineResult } from '@credex/audit-engine';
+import type { AuditEngineResult } from '@ledgerly/audit-engine';
 
 export interface SummarizeOutput {
   summary: string;

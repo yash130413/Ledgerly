@@ -12,7 +12,7 @@ import {
   Cell,
 } from "recharts";
 import { motion } from "framer-motion";
-import type { WorkspaceMetrics } from "@credex/audit-engine";
+import type { WorkspaceMetrics } from "@ledgerly/audit-engine";
 
 interface Props {
   workspaces: WorkspaceMetrics[];

@@ -12,7 +12,7 @@ export class MailService {
   }
 
   private from() {
-    return this.config.get<string>('emailFrom') ?? 'Credex <onboarding@resend.dev>';
+    return this.config.get<string>('emailFrom') ?? 'Ledgerly <onboarding@resend.dev>';
   }
 
   async sendAuditReady(params: {
@@ -32,7 +32,7 @@ export class MailService {
       to: params.to,
       subject: `Your AI spend audit is ready — ${params.auditTitle}`,
       html: `
-        <h1>Your Credex audit is ready</h1>
+        <h1>Your Ledgerly audit is ready</h1>
         <p>Hi ${params.companyName},</p>
         <p><strong>${params.auditTitle}</strong></p>
         <ul>
@@ -58,9 +58,9 @@ export class MailService {
     const { error } = await this.resend.emails.send({
       from: this.from(),
       to: params.to,
-      subject: "Welcome to Credex — you're on the list",
+      subject: "Welcome to Ledgerly — you're on the list",
       html: `
-        <h1>Welcome to Credex</h1>
+        <h1>Welcome to Ledgerly</h1>
         <p>Thanks ${params.role} at ${params.company} — you're on the list.</p>
       `,
     });

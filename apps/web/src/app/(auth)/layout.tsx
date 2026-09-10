@@ -27,7 +27,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               <path d="M2 7h4M8 7h4M7 2v4M7 8v4" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
             </svg>
           </span>
-          <span className="font-bold text-xl tracking-tight text-gray-900">Credex</span>
+          <span className="font-bold text-xl tracking-tight text-gray-900">Ledgerly</span>
         </Link>
       </motion.div>
 

@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   resolve: {
     alias: {
-      "@credex/audit-engine": path.resolve(__dirname, "./src/index.ts"),
+      "@ledgerly/audit-engine": path.resolve(__dirname, "./src/index.ts"),
     },
   },
   test: {

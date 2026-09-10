@@ -1,4 +1,4 @@
-# User Interviews — Credex AI Spend Audit
+# User Interviews — Ledgerly AI Spend Audit
 
 ## Interview 1 — Yogesh, Program Manager, Icertis
 

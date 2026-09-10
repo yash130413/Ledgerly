@@ -9,7 +9,7 @@ import { RecommendationCard } from "@/components/app/overview/recommendation-car
 import { PageTransition, FadeIn } from "@/components/shared/motion";
 import { mockStats, mockSpendChart } from "@/modules/integrations/mock-data";
 import { mockWorkspaces } from "@/modules/audits/fixtures/mock-workspaces";
-import { runAuditEngine } from "@credex/audit-engine";
+import { runAuditEngine } from "@ledgerly/audit-engine";
 
 export const metadata: Metadata = { title: "Dashboard" };
 

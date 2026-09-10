@@ -1,4 +1,4 @@
-# Credex — Project Reflection
+# Ledgerly — Project Reflection
 
 > This document is intentionally left partially blank.
 >
@@ -327,7 +327,7 @@ assignment like this. Budget for it upfront.
 ```
 
 **On the problem space:**
-After building this, do you believe the problem Credex solves is
+After building this, do you believe the problem Ledgerly solves is
 painful enough that people will pay to solve it — or did building it
 change your view on that?
 

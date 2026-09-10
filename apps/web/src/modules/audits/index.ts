@@ -4,7 +4,7 @@ import type {
   AuditProvider,
   AuditRecommendation,
   WorkspaceMetrics,
-} from "@credex/audit-engine";
+} from "@ledgerly/audit-engine";
 
 export type {
   AuditEngineResult,
@@ -14,7 +14,7 @@ export type {
   WorkspaceMetrics,
 };
 
-export { runAuditEngine, mapProviderId, mapWorkspacesToEngine } from "@credex/audit-engine";
+export { runAuditEngine, mapProviderId, mapWorkspacesToEngine } from "@ledgerly/audit-engine";
 
 const API_BASE =
   process.env.API_INTERNAL_URL?.replace(/\/$/, "") ?? "http://localhost:3001";

@@ -5,8 +5,8 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 export const siteMetadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: 'Credex - AI Spend Audit & Optimization Platform',
-    template: '%s | Credex',
+    default: 'Ledgerly - AI Spend Audit & Optimization Platform',
+    template: '%s | Ledgerly',
   },
   description: 'Identify wasted AI software spend across ChatGPT, Claude, Cursor, GitHub Copilot, and Gemini. Free audit, no signup required.',
   keywords: [
@@ -25,24 +25,24 @@ export const siteMetadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: APP_URL,
-    title: 'Credex - AI Spend Audit & Optimization',
+    title: 'Ledgerly - AI Spend Audit & Optimization',
     description: 'Free AI software spend audit. Identify wasted spend, inactive seats, and duplicate tools.',
-    siteName: 'Credex',
+    siteName: 'Ledgerly',
     images: [
       {
         url: `${APP_URL}/og-default.png`,
         width: 1200,
         height: 630,
-        alt: 'Credex AI Spend Audit',
+        alt: 'Ledgerly AI Spend Audit',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Credex - AI Spend Audit & Optimization',
+    title: 'Ledgerly - AI Spend Audit & Optimization',
     description: 'Free AI software spend audit. No signup required.',
     images: [`${APP_URL}/og-default.png`],
-    creator: '@credexai',
+    creator: '@ledgerlyai',
   },
   robots: {
     index: true,

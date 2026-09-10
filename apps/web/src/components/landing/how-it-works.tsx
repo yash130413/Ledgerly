@@ -7,7 +7,7 @@ const steps = [
     icon: Plug,
     title: "Connect your AI tools",
     description:
-      "Add your providers in under 2 minutes. Credex connects to ChatGPT, Claude, Cursor, GitHub Copilot, and Gemini using read-only access — no changes to your workflows.",
+      "Add your providers in under 2 minutes. Ledgerly connects to ChatGPT, Claude, Cursor, GitHub Copilot, and Gemini using read-only access — no changes to your workflows.",
   },
   {
     n: "02",

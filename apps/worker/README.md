@@ -1,4 +1,4 @@
-# @credex/worker
+# @ledgerly/worker
 
 Background jobs (BullMQ / Redis): audit summarize, email, CSV ingest, etc.
 

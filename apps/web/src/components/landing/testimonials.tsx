@@ -3,13 +3,13 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const testimonials = [
   {
-    quote: "Credex found $3,200/month in wasted OpenAI spend in the first audit. We had no idea we were embedding the same documents on every request.",
+    quote: "Ledgerly found $3,200/month in wasted OpenAI spend in the first audit. We had no idea we were embedding the same documents on every request.",
     name: "Sarah Chen",
     title: "CTO, Loopline AI",
     initials: "SC",
   },
   {
-    quote: "We were using GPT-4 for literally everything. Credex showed us that 70% of our calls could be handled by GPT-3.5 with identical output quality.",
+    quote: "We were using GPT-4 for literally everything. Ledgerly showed us that 70% of our calls could be handled by GPT-3.5 with identical output quality.",
     name: "Marcus Webb",
     title: "Head of Engineering, Draftly",
     initials: "MW",
@@ -33,7 +33,7 @@ const testimonials = [
     initials: "LM",
   },
   {
-    quote: "We run 5 different AI tools across the team. Credex is the only way we can tell which ones are actually worth the cost.",
+    quote: "We run 5 different AI tools across the team. Ledgerly is the only way we can tell which ones are actually worth the cost.",
     name: "Tom Briggs",
     title: "Founder, Briefcase AI",
     initials: "TB",

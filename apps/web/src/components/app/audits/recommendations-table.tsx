@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, cn } from "@/lib/utils";
-import type { AuditRecommendation, AuditPriority, AuditProvider } from "@credex/audit-engine";
+import type { AuditRecommendation, AuditPriority, AuditProvider } from "@ledgerly/audit-engine";
 
 const PRIORITY_STYLES: Record<AuditPriority, string> = {
   Critical: "bg-red-50 text-red-600 border-red-200",

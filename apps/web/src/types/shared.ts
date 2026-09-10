@@ -4,7 +4,7 @@ export type {
   AuditRecommendation,
   WorkspaceMetrics,
   AuditEngineResult,
-} from "@credex/audit-engine";
+} from "@ledgerly/audit-engine";
 
 export type Provider =
   | "openai"

@@ -63,7 +63,7 @@ export function GET() {
 
         {/* Wordmark */}
         <div style={{ fontSize: "56px", fontWeight: 700, color: "white", letterSpacing: "-1.5px", marginBottom: "18px" }}>
-          Credex
+          Ledgerly
         </div>
 
         {/* Tagline */}

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { AuditEngineResult, WorkspaceMetrics } from '@credex/audit-engine';
+import type { AuditEngineResult, WorkspaceMetrics } from '@ledgerly/audit-engine';
 import { SupabaseService } from '../../../../infra/supabase/supabase.service';
 import type {
   AuditRecommendationRow,

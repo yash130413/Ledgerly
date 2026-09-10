@@ -1,4 +1,4 @@
-# Credex — Unit Economics
+# Ledgerly — Unit Economics
 
 ## Preface: What Makes These Numbers Realistic
 
@@ -10,7 +10,7 @@ Every number here has an explicit assumption behind it. Where the assumption is 
 
 ## Pricing Model
 
-Before unit economics can be calculated, pricing must be defined. Credex doesn't have a paid tier yet. Here is the proposed model based on the ICP and the value delivered.
+Before unit economics can be calculated, pricing must be defined. Ledgerly doesn't have a paid tier yet. Here is the proposed model based on the ICP and the value delivered.
 
 ### Proposed Tier Structure
 
@@ -70,7 +70,7 @@ Retained customers (Year 2+)
 
 **Visitor → Free Signup: 3.5%**
 
-Basis: Developer tools with a free tier and a clear, specific value proposition (not "optimize your workflow") typically see 2–5% visitor-to-signup conversion. Credex's value prop is unusually concrete ("see your wasted AI spend in 2 minutes") which pushes toward the higher end. 3.5% is conservative.
+Basis: Developer tools with a free tier and a clear, specific value proposition (not "optimize your workflow") typically see 2–5% visitor-to-signup conversion. Ledgerly's value prop is unusually concrete ("see your wasted AI spend in 2 minutes") which pushes toward the higher end. 3.5% is conservative.
 
 What would move this number:
 - Up: A/B testing the headline, adding a live demo on the landing page, faster time-to-value
@@ -93,7 +93,7 @@ What would move this number:
 
 Basis: B2B SaaS tools in the $50–$200/mo range with genuine workflow integration typically see 80–90% annual retention. 85% implies 15% annual churn (~1.3%/month).
 
-Credex's retention risk is higher than average because:
+Ledgerly's retention risk is higher than average because:
 - The problem is partially solved after the first audit (one-time insight vs. ongoing monitoring)
 - If a team acts on the recommendations and cancels, that's actually a success — but it's still churn
 

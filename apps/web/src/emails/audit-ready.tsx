@@ -1,6 +1,6 @@
 import { Section, Text, Button, Row, Column } from "react-email";
 import { EmailLayout } from "@/emails/components/email-layout";
-import type { AuditRecommendation, AuditPriority } from "@credex/audit-engine";
+import type { AuditRecommendation, AuditPriority } from "@ledgerly/audit-engine";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

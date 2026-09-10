@@ -107,7 +107,7 @@ function SuccessState({ onClose }: { onClose: () => void }) {
       <div className="flex flex-col gap-2">
         <h3 className="text-lg font-semibold">You&apos;re on the list</h3>
         <p className="text-sm text-muted-foreground max-w-xs">
-          We'll be in touch with personalized recommendations and early access to Credex.
+          We'll be in touch with personalized recommendations and early access to Ledgerly.
         </p>
       </div>
       <Button onClick={onClose} size="sm" className="gap-1.5">
@@ -237,7 +237,7 @@ export function LeadCaptureModal({
                         {recommendationCount
                           ? `We found ${recommendationCount} optimization opportunities in your stack. `
                           : ""}
-                        Get a personalized action plan and early access to Credex.
+                        Get a personalized action plan and early access to Ledgerly.
                       </p>
 
                       {/* Social proof strip */}

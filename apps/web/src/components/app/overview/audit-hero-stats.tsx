@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { formatCurrency, cn } from "@/lib/utils";
-import type { AuditEngineResult } from "@credex/audit-engine";
+import type { AuditEngineResult } from "@ledgerly/audit-engine";
 import styles from "@/components/components.module.css";
 
 // ── Efficiency score ring ─────────────────────────────────────────────────────

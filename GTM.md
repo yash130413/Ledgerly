@@ -1,10 +1,10 @@
-# Credex — Go-To-Market Strategy
+# Ledgerly — Go-To-Market Strategy
 
 ## The Honest Starting Point
 
 Most GTM docs for early-stage products are aspirational fiction. This one is not.
 
-Credex is a zero-revenue product at launch. The goal of the first 90 days is not growth — it is **learning whether the problem is painful enough to pay for**. Every tactic below is chosen to answer that question as fast as possible with the least wasted effort.
+Ledgerly is a zero-revenue product at launch. The goal of the first 90 days is not growth — it is **learning whether the problem is painful enough to pay for**. Every tactic below is chosen to answer that question as fast as possible with the least wasted effort.
 
 The product has one structural advantage worth exploiting early: **the audit output is shareable**. Every public report is a distribution artifact. That shapes the entire strategy.
 
@@ -99,7 +99,7 @@ The goal is not to go viral. The goal is 5–10 people per post who DM asking to
 Timing: Tuesday–Thursday, 9–11am ET. Title matters enormously.
 
 Good titles:
-- `Show HN: Credex – audit your team's AI software spend (ChatGPT, Claude, Cursor, Copilot)`
+- `Show HN: Ledgerly – audit your team's AI software spend (ChatGPT, Claude, Cursor, Copilot)`
 - `Show HN: We built deterministic AI spend audits instead of LLM-generated recommendations`
 
 Bad titles:
@@ -112,7 +112,7 @@ Realistic outcome from a decent Show HN: 50–200 upvotes, 20–40 comments, 100
 
 **Indie Hackers:**
 
-Post a "building in public" update: *"Launched Credex — here's what the first 30 audits taught us about how startups waste AI spend."* Indie Hackers rewards transparency and real numbers. Share the actual data: how many audits run, average savings identified, most common rule triggered, what surprised you.
+Post a "building in public" update: *"Launched Ledgerly — here's what the first 30 audits taught us about how startups waste AI spend."* Indie Hackers rewards transparency and real numbers. Share the actual data: how many audits run, average savings identified, most common rule triggered, what surprised you.
 
 ### Week 5–8: 50 More Users from Product Hunt + Compounding
 
@@ -144,7 +144,7 @@ Every time someone generates an audit and shares it with their CFO, board, or te
 
 1. Show the full audit output — don't gate it
 2. Have a clear CTA at the top: *"Run an audit for your team — free, 2 minutes"*
-3. Include the Credex branding prominently but not obnoxiously
+3. Include the Ledgerly branding prominently but not obnoxiously
 4. Be fast — a slow public report page kills the referral loop
 
 The goal is that every shared report generates at least 0.3 new signups on average. At 100 audits shared, that's 30 organic signups with zero additional effort.
@@ -155,7 +155,7 @@ The goal is that every shared report generates at least 0.3 new signups on avera
 
 **Positioning that works:**
 
-> "Credex audits your AI software spend across ChatGPT, Claude, Cursor, and Copilot — surfaces inactive seats, duplicate subscriptions, and estimated annual savings in 2 minutes."
+> "Ledgerly audits your AI software spend across ChatGPT, Claude, Cursor, and Copilot — surfaces inactive seats, duplicate subscriptions, and estimated annual savings in 2 minutes."
 
 This works because it's specific, it names the tools people actually use, and it promises a concrete output in a concrete time.
 

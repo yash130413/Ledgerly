@@ -14,7 +14,7 @@ import type {
   AuditPriority,
   AuditProvider,
   WorkspaceMetrics,
-} from "@credex/audit-engine";
+} from "@ledgerly/audit-engine";
 import styles from "@/components/components.module.css";
 import { SlidersHorizontal, Inbox } from "lucide-react";
 

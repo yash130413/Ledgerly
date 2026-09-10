@@ -8,4 +8,4 @@ Disallow: /integrations
 Disallow: /settings
 Disallow: /api/
 
-Sitemap: https://credex-app-six.vercel.app/sitemap.xml
+Sitemap: http://localhost:3000/sitemap.xml

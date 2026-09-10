@@ -1,4 +1,4 @@
-# Pricing Data Sources — Credex
+# Pricing Data Sources — Ledgerly
 
 All pricing data used in the audit engine is sourced from official vendor pricing pages. Every number is verified as of **May 27, 2026**.
 
@@ -254,4 +254,4 @@ No third-party pricing aggregators or unofficial sources are used. Every number 
 
 Pricing data is accurate as of the verification date (May 27, 2026). Vendors may change pricing at any time. Users should verify current pricing on the vendor's official website before making purchasing decisions.
 
-Credex is not responsible for pricing changes made by vendors after the verification date.
+Ledgerly is not responsible for pricing changes made by vendors after the verification date.

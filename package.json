@@ -1,5 +1,5 @@
 {
-  "name": "credex-app",
+  "name": "ledgerly",
   "version": "0.1.0",
   "private": true,
   "workspaces": [
@@ -8,17 +8,17 @@
   ],
   "scripts": {
     "dev": "concurrently -n web,api -c cyan,magenta \"npm run dev:web\" \"npm run dev:api\"",
-    "dev:web": "npm run dev -w @credex/web",
-    "dev:api": "npm run start:dev -w @credex/api",
-    "build": "npm run build -w @credex/audit-engine && npm run build -w @credex/api && npm run build -w @credex/web",
-    "build:web": "npm run build -w @credex/web",
-    "build:api": "npm run build -w @credex/audit-engine && npm run build -w @credex/api",
-    "start": "npm run start -w @credex/web",
-    "start:api": "npm run start:prod -w @credex/api",
-    "lint": "npm run lint -w @credex/web",
-    "test": "npm run test -w @credex/audit-engine",
-    "test:watch": "npm run test:watch -w @credex/audit-engine",
-    "test:api": "npm run test -w @credex/api"
+    "dev:web": "npm run dev -w @ledgerly/web",
+    "dev:api": "npm run start:dev -w @ledgerly/api",
+    "build": "npm run build -w @ledgerly/audit-engine && npm run build -w @ledgerly/api && npm run build -w @ledgerly/web",
+    "build:web": "npm run build -w @ledgerly/web",
+    "build:api": "npm run build -w @ledgerly/audit-engine && npm run build -w @ledgerly/api",
+    "start": "npm run start -w @ledgerly/web",
+    "start:api": "npm run start:prod -w @ledgerly/api",
+    "lint": "npm run lint -w @ledgerly/web",
+    "test": "npm run test -w @ledgerly/audit-engine",
+    "test:watch": "npm run test:watch -w @ledgerly/audit-engine",
+    "test:api": "npm run test -w @ledgerly/api"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

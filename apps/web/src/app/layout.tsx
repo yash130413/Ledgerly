@@ -11,22 +11,22 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
-  title: { default: "Credex — AI Spend Audit", template: "%s | Credex" },
+  title: { default: "Ledgerly — AI Spend Audit", template: "%s | Ledgerly" },
   description:
     "Audit, optimize, and control your AI API spending across all providers. Cut costs without cutting capability.",
   metadataBase: new URL(APP_URL),
   openGraph: {
-    title: "Credex — AI Spend Audit",
-    description: "Stop overpaying for AI APIs. Credex audits your spend and surfaces savings.",
+    title: "Ledgerly — AI Spend Audit",
+    description: "Stop overpaying for AI APIs. Ledgerly audits your spend and surfaces savings.",
     type: "website",
     url: APP_URL,
-    siteName: "Credex",
-    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "Credex — AI Spend Audit" }],
+    siteName: "Ledgerly",
+    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "Ledgerly — AI Spend Audit" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Credex — AI Spend Audit",
-    description: "Stop overpaying for AI APIs. Credex audits your spend and surfaces savings.",
+    title: "Ledgerly — AI Spend Audit",
+    description: "Stop overpaying for AI APIs. Ledgerly audits your spend and surfaces savings.",
     images: ["/og-default.png"],
   },
 };

@@ -11,7 +11,7 @@ import {
   Cell,
 } from "recharts";
 import { motion } from "framer-motion";
-import type { AuditRecommendation, AuditProvider } from "@credex/audit-engine";
+import type { AuditRecommendation, AuditProvider } from "@ledgerly/audit-engine";
 import { formatCurrency } from "@/lib/utils";
 
 const PROVIDER_COLORS: Record<AuditProvider, string> = {

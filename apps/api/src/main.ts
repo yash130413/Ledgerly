@@ -25,7 +25,7 @@ async function bootstrap() {
 
   const port = Number(process.env.API_PORT ?? process.env.PORT ?? 3001);
   await app.listen(port);
-  console.log(`Credex API listening on http://localhost:${port}/api`);
+  console.log(`Ledgerly API listening on http://localhost:${port}/api`);
 }
 
 void bootstrap();

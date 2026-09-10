@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocalStorage } from "./use-local-storage";
-import type { AuditPriority, AuditProvider } from "@credex/audit-engine";
+import type { AuditPriority, AuditProvider } from "@ledgerly/audit-engine";
 
 interface AuditFormState {
   priorityFilter: AuditPriority | "All";

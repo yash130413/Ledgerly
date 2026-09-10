@@ -1,6 +1,6 @@
-# @credex/web (Next.js)
+# @ledgerly/web (Next.js)
 
-Production UI for Credex AI spend audit.
+Production UI for Ledgerly AI spend audit.
 
 ```
 src/app/           # routes
@@ -11,7 +11,7 @@ src/modules/       # thin web adapters
 ```
 
 ```bash
-npm run dev -w @credex/web
+npm run dev -w @ledgerly/web
 ```
 
 Env is loaded from the **monorepo root** `.env.local` via `next.config.ts`.

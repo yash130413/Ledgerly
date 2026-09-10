@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AuditResultsDashboard } from "@/components/app/audits/audit-results-dashboard";
 import { PageTransition, FadeIn } from "@/components/shared/motion";
 import { mockWorkspaces } from "@/modules/audits/fixtures/mock-workspaces";
-import { runAuditEngine } from "@credex/audit-engine";
+import { runAuditEngine } from "@ledgerly/audit-engine";
 
 export const metadata: Metadata = { title: "Audit Results" };
 

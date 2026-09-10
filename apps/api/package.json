@@ -1,5 +1,5 @@
 {
-  "name": "@credex/api",
+  "name": "@ledgerly/api",
   "version": "0.1.0",
   "private": true,
   "license": "UNLICENSED",
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.98.0",
-    "@credex/audit-engine": "*",
+    "@ledgerly/audit-engine": "*",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
@@ -62,7 +62,7 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^@credex/audit-engine$": "<rootDir>/../../../packages/audit-engine/src/index.ts"
+      "^@ledgerly/audit-engine$": "<rootDir>/../../../packages/audit-engine/src/index.ts"
     }
   }
 }

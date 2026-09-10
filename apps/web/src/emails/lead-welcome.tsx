@@ -13,12 +13,12 @@ export default function LeadWelcomeEmail({
   reportUrl,
 }: LeadWelcomeEmailProps) {
   return (
-    <EmailLayout preview={`Welcome to Credex, ${company} — here's what happens next`}>
+    <EmailLayout preview={`Welcome to Ledgerly, ${company} — here's what happens next`}>
 
       {/* Headline */}
       <Section style={s.section}>
         <Text style={s.eyebrow}>You're in</Text>
-        <Text style={s.heading}>Welcome to Credex</Text>
+        <Text style={s.heading}>Welcome to Ledgerly</Text>
         <Text style={s.body}>
           Thanks for your interest, {company}. We've noted your role as{" "}
           <strong style={{ color: "#e5e7eb" }}>{role}</strong> and will tailor
@@ -69,7 +69,7 @@ const STEPS = [
     desc: "We'll prepare a detailed action plan based on your team size and role.",
   },
   {
-    title: "Early access to Credex",
+    title: "Early access to Ledgerly",
     desc: "You'll be among the first to access our full platform when it launches.",
   },
   {

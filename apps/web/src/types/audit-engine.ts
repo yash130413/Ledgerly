@@ -1,8 +1,8 @@
-/** @deprecated Prefer `@credex/audit-engine` or `@/modules/audits` */
+/** @deprecated Prefer `@ledgerly/audit-engine` or `@/modules/audits` */
 export type {
   AuditProvider,
   AuditPriority,
   AuditRecommendation,
   WorkspaceMetrics,
   AuditEngineResult,
-} from "@credex/audit-engine";
+} from "@ledgerly/audit-engine";

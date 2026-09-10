@@ -8,16 +8,16 @@ import { cn } from "@/lib/utils";
 
 const faqs = [
   {
-    q: "How does Credex connect to my AI providers?",
+    q: "How does Ledgerly connect to my AI providers?",
     a: "You paste your existing API keys — we never store them in plaintext. We use them read-only to pull usage logs and billing data. You can revoke access at any time from your settings.",
   },
   {
-    q: "Will Credex slow down my API calls?",
-    a: "No. Credex is entirely out-of-band. We pull usage data directly from provider billing APIs and logs — we never sit in the request path, so there's zero latency impact.",
+    q: "Will Ledgerly slow down my API calls?",
+    a: "No. Ledgerly is entirely out-of-band. We pull usage data directly from provider billing APIs and logs — we never sit in the request path, so there's zero latency impact.",
   },
   {
-    q: "How much does Credex cost?",
-    a: "Credex is free for teams spending up to $5k/month on AI APIs. Above that, we charge 1% of the spend we audit — and we guarantee to find at least 3x that in savings, or your money back.",
+    q: "How much does Ledgerly cost?",
+    a: "Ledgerly is free for teams spending up to $5k/month on AI APIs. Above that, we charge 1% of the spend we audit — and we guarantee to find at least 3x that in savings, or your money back.",
   },
   {
     q: "Which providers are supported?",
@@ -32,7 +32,7 @@ const faqs = [
     a: "Yes. All data is encrypted at rest (AES-256) and in transit (TLS 1.3). We are SOC 2 Type II certified and GDPR compliant. We never share your data with third parties.",
   },
   {
-    q: "Can I use Credex for multiple teams or projects?",
+    q: "Can I use Ledgerly for multiple teams or projects?",
     a: "Absolutely. You can create workspaces per team, tag API calls by project or feature, and set separate budgets and alerts for each. It's built for multi-team engineering orgs.",
   },
 ];

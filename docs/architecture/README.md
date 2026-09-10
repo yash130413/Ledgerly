@@ -1,6 +1,6 @@
 # Architecture
 
-Credex = AI spend audit & optimization platform.
+Ledgerly = AI spend audit & optimization platform.
 
 ## Target system
 

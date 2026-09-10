@@ -1,5 +1,5 @@
 {
-  "name": "@credex/api-client",
+  "name": "@ledgerly/api-client",
   "version": "0.0.0",
   "private": true,
   "main": "./src/index.ts",

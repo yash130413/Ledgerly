@@ -8,7 +8,7 @@ import {
   mapWorkspacesToEngine,
   runAuditEngine,
   type AuditEngineResult,
-} from '@credex/audit-engine';
+} from '@ledgerly/audit-engine';
 import { AiService } from '../../../../infra/ai/ai.service';
 import { MailService } from '../../../../infra/mail/mail.service';
 import { AuditsRepository } from '../../infrastructure/persistence/audits.repository';

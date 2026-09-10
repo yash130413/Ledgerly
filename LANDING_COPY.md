@@ -1,4 +1,4 @@
-# Landing Page Copy — Credex
+# Landing Page Copy — Ledgerly
 
 ## Hero Section
 
@@ -24,7 +24,7 @@ Most engineering teams waste 30-40% of their AI software budget on:
 - Premium plans for casual users
 - Annual contracts that don't match actual usage
 
-**Credex finds the waste in 2 minutes. No signup required.**
+**Ledgerly finds the waste in 2 minutes. No signup required.**
 
 ---
 
@@ -36,7 +36,7 @@ Most engineering teams waste 30-40% of their AI software budget on:
 > **— Sarah Chen, CTO @ Streamline (42 employees)**
 
 ### Testimonial 2 (Mocked)
-> "I had no idea we were paying for both Cursor and Copilot for the same engineers. Credex caught the overlap immediately."
+> "I had no idea we were paying for both Cursor and Copilot for the same engineers. Ledgerly caught the overlap immediately."
 >
 > **— Marcus Rodriguez, Engineering Manager @ DataFlow**
 
@@ -68,7 +68,7 @@ Every audit gets a unique shareable URL. Forward it to your CFO, VP, or board wi
 ## FAQ
 
 ### 1. Is this really free?
-**Yes.** The audit tool is completely free with no credit card required. We make money by helping companies with significant savings opportunities ($500+/month) access discounted AI credits through Credex's marketplace.
+**Yes.** The audit tool is completely free with no credit card required. We make money by helping companies with significant savings opportunities ($500+/month) access discounted AI credits through Ledgerly's marketplace.
 
 ### 2. Do I need to sign up or create an account?
 **No.** You can run an audit and see results without any signup. We only ask for your email if you want to save the report or book a consultation for high-savings cases.
@@ -141,7 +141,7 @@ Free AI spend audit tool for startups. Analyze ChatGPT, Claude, Cursor, and Copi
 ## Open Graph / Social Share Copy
 
 ### OG Title
-Credex — Free AI Spend Audit Tool
+Ledgerly — Free AI Spend Audit Tool
 
 ### OG Description
 Find wasted spend on ChatGPT, Claude, Cursor, and Copilot in 2 minutes. Free audit, no signup required.
@@ -162,7 +162,7 @@ Your audit identified **$[X]/month** ($[Y]/year) in potential savings.
 Enter your email to:
 - Get a permanent link to this report
 - Receive updates when new optimization opportunities apply to your stack
-- [If savings > $500] Book a free consultation with Credex to access discounted AI credits
+- [If savings > $500] Book a free consultation with Ledgerly to access discounted AI credits
 
 ### CTA Button
 **Email Me the Report**
@@ -180,7 +180,7 @@ No thanks, I'll screenshot it
 **You Could Save $[X]/Year**
 
 ### Body
-Your audit identified significant optimization opportunities. Credex can help you capture even more savings through:
+Your audit identified significant optimization opportunities. Ledgerly can help you capture even more savings through:
 
 - Discounted AI infrastructure credits (20-40% off retail)
 - Vendor consolidation strategies
@@ -220,19 +220,19 @@ Want to be notified if new optimization opportunities apply to your stack? Enter
 ## Footer Copy
 
 ### Tagline
-**Credex — Stop overpaying for AI tools**
+**Ledgerly — Stop overpaying for AI tools**
 
 ### Links
 - How It Works
 - Example Report
 - Pricing Data Sources
-- About Credex
+- About Ledgerly
 - Contact
 - Privacy Policy
 - Terms of Service
 
 ### Contact
-Questions? Email us at hello@credex.rocks
+Questions? Email us at hello@ledgerly.com
 
 ---
 
@@ -247,7 +247,7 @@ Questions? Email us at hello@credex.rocks
 **What doesn't work:**
 - Vague promises ("Optimize your workflow")
 - Overhyping ("Revolutionary AI-powered platform")
-- Hiding the business model (be upfront about Credex consultation for high-savings cases)
+- Hiding the business model (be upfront about Ledgerly consultation for high-savings cases)
 - Jargon ("Leverage synergies across your AI stack")
 
 **Target audience:**

@@ -44,7 +44,7 @@ export function Navbar() {
               <path d="M2 7h4M8 7h4M7 2v4M7 8v4" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
             </svg>
           </span>
-          <span className="font-semibold text-[15px] tracking-tight text-gray-900">Credex</span>
+          <span className="font-semibold text-[15px] tracking-tight text-gray-900">Ledgerly</span>
         </Link>
 
         {/* Desktop links */}

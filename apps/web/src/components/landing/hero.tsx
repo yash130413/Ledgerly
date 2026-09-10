@@ -211,7 +211,7 @@ function MockDashboard() {
           <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/60" />
           <span className="w-2.5 h-2.5 rounded-full bg-green-400/60" />
           <span className="ml-3 h-5 flex-1 max-w-[180px] rounded-lg bg-gray-200/60 text-[10px] text-gray-400 flex items-center px-2.5">
-            app.localhost:3000/audits
+            app.example.com/audits
           </span>
         </div>
 
@@ -329,7 +329,7 @@ export function Hero() {
             {...fadeUp(0.16)}
             className="text-lg text-gray-500 leading-relaxed max-w-md"
           >
-            Credex audits seat utilization, detects duplicate vendors, and surfaces
+            Ledgerly audits seat utilization, detects duplicate vendors, and surfaces
             finance-ready optimization recommendations across all major AI providers.
           </motion.p>
 

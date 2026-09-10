@@ -18,7 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, cn } from "@/lib/utils";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
-import type { AuditRecommendation, AuditPriority, AuditProvider } from "@credex/audit-engine";
+import type { AuditRecommendation, AuditPriority, AuditProvider } from "@ledgerly/audit-engine";
 
 const PRIORITY_CONFIG: Record<
   AuditPriority,

@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="./public/next.svg" alt="Credex" width="120" />
+<img src="./apps/web/public/next.svg" alt="Ledgerly" width="120" />
 
-# Credex
+# Ledgerly
 
 **AI Spend Audit & Optimization Platform**
 
@@ -25,7 +25,7 @@ Identify wasted AI software spend, underutilized subscriptions, duplicate toolin
 
 As AI adoption scales inside organizations, software costs across AI assistants and APIs are growing faster than visibility into how those tools are actually being used.
 
-Credex gives engineering and finance teams a clear picture of their AI software spend — surfacing underutilized seats, overlapping vendor subscriptions, and optimization opportunities with explainable, finance-friendly recommendations.
+Ledgerly gives engineering and finance teams a clear picture of their AI software spend — surfacing underutilized seats, overlapping vendor subscriptions, and optimization opportunities with explainable, finance-friendly recommendations.
 
 **The core audit tool is completely free and requires no signup.** Users can run an instant audit, see their savings, and optionally provide an email to save the report. The platform also includes authentication and dashboard features for users who want to save multiple audits and track optimization over time.
 
@@ -222,7 +222,7 @@ ANTHROPIC_API_KEY=
 
 # Resend
 RESEND_API_KEY=
-EMAIL_FROM=Credex <onboarding@resend.dev>
+EMAIL_FROM=Ledgerly <onboarding@resend.dev>
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000

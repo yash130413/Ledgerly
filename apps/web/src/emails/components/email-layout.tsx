@@ -24,7 +24,7 @@ export function EmailLayout({ preview, children }: Props) {
         <Container style={styles.container}>
           {/* Logo / wordmark */}
           <Section style={styles.header}>
-            <Text style={styles.logo}>Credex</Text>
+            <Text style={styles.logo}>Ledgerly</Text>
             <Text style={styles.logoSub}>AI Spend Optimization</Text>
           </Section>
 
@@ -40,12 +40,12 @@ export function EmailLayout({ preview, children }: Props) {
             <Text style={styles.footerText}>
               You received this email because you used{" "}
               <Link href={process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"} style={styles.footerLink}>
-                Credex
+                Ledgerly
               </Link>
               . We never share your data.
             </Text>
             <Text style={styles.footerText}>
-              © {new Date().getFullYear()} Credex · AI Spend Optimization
+              © {new Date().getFullYear()} Ledgerly · AI Spend Optimization
             </Text>
           </Section>
         </Container>

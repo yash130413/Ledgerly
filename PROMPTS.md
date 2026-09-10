@@ -1,8 +1,8 @@
-# LLM Prompts — Credex
+# LLM Prompts — Ledgerly
 
 ## Overview
 
-Credex uses the Anthropic Claude API for **narrative generation only**. The audit engine itself is deterministic and rule-based — no LLM is involved in calculating savings or generating recommendations.
+Ledgerly uses the Anthropic Claude API for **narrative generation only**. The audit engine itself is deterministic and rule-based — no LLM is involved in calculating savings or generating recommendations.
 
 The LLM is used to:
 1. Generate a personalized ~100-word summary paragraph for each audit

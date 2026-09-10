@@ -57,7 +57,7 @@ function SidebarContent({ email, fullName, onNav }: SidebarProps & { onNav?: () 
           <span className="w-7 h-7 rounded-xl bg-green-600 flex items-center justify-center shadow-sm">
             <TrendingDown className="w-3.5 h-3.5 text-white" />
           </span>
-          <span className="font-bold text-[15px] tracking-tight text-gray-900">Credex</span>
+          <span className="font-bold text-[15px] tracking-tight text-gray-900">Ledgerly</span>
         </Link>
       </motion.div>
 
@@ -141,7 +141,7 @@ export function Sidebar({ email, fullName }: SidebarProps) {
             <span className="w-6 h-6 rounded-lg bg-green-600 flex items-center justify-center">
               <TrendingDown className="w-3 h-3 text-white" />
             </span>
-            <span className="font-bold text-sm tracking-tight text-gray-900">Credex</span>
+            <span className="font-bold text-sm tracking-tight text-gray-900">Ledgerly</span>
           </Link>
           <button
             onClick={() => setMobileOpen((v) => !v)}

@@ -132,7 +132,7 @@ export function ExampleRecommendations() {
             Example findings
           </p>
           <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-balance max-w-xl text-gray-900">
-            The kind of recommendations Credex surfaces
+            The kind of recommendations Ledgerly surfaces
           </h2>
           <p className="mt-4 text-gray-500 text-lg max-w-lg leading-relaxed">
             Every recommendation includes a confidence score, affected user count, and

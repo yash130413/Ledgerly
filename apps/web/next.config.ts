@@ -6,7 +6,7 @@ import { loadEnvConfig } from "@next/env";
 loadEnvConfig(path.resolve(__dirname, "../.."));
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@credex/audit-engine"],
+  transpilePackages: ["@ledgerly/audit-engine"],
 };
 
 export default nextConfig;

@@ -304,7 +304,7 @@ self.__SERVER_FILES_MANIFEST={
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.ts",
     "transpilePackages": [
-      "@credex/audit-engine"
+      "@ledgerly/audit-engine"
     ],
     "turbopack": {
       "root": "C:\\credex-app"

@@ -8,5 +8,5 @@ export default () => ({
   },
   anthropicApiKey: process.env.ANTHROPIC_API_KEY,
   resendApiKey: process.env.RESEND_API_KEY,
-  emailFrom: process.env.EMAIL_FROM ?? 'Credex <onboarding@resend.dev>',
+  emailFrom: process.env.EMAIL_FROM ?? 'Ledgerly <onboarding@resend.dev>',
 });

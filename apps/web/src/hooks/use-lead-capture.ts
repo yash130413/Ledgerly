@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-const STORAGE_KEY = "credex_lead_captured";
-const DISMISS_KEY = "credex_lead_dismissed";
+const STORAGE_KEY = "ledgerly_lead_captured";
+const DISMISS_KEY = "ledgerly_lead_dismissed";
 const SCROLL_THRESHOLD = 0.60; // 60% scroll depth = value delivered
 const DISMISS_COOLDOWN_MS = 3 * 24 * 60 * 60 * 1000; // re-show after 3 days if dismissed
 

@@ -1,4 +1,4 @@
-# Development Log — Credex AI Spend Audit Tool
+# Development Log — Ledgerly AI Spend Audit Tool
 
 ---
 

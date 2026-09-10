@@ -1,4 +1,4 @@
-# Automated Tests — Credex
+# Automated Tests — Ledgerly
 
 ## Overview
 
@@ -262,7 +262,7 @@ All tests passing ✅
 
 ## Why These Tests Matter
 
-The audit engine is the core value proposition of Credex. If the savings calculations are wrong, users lose trust. If the rules fire incorrectly, recommendations are useless.
+The audit engine is the core value proposition of Ledgerly. If the savings calculations are wrong, users lose trust. If the rules fire incorrectly, recommendations are useless.
 
 These 25 tests ensure:
 1. **Financial accuracy** — Every dollar of savings is calculated correctly

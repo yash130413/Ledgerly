@@ -1,4 +1,4 @@
-# Metrics — Credex
+# Metrics — Ledgerly
 
 ## North Star Metric
 
@@ -6,7 +6,7 @@
 
 ### Why This Metric
 
-The North Star for Credex at this stage is not revenue, signups, or even leads captured. It's **completed audits that produce a shareable report**.
+The North Star for Ledgerly at this stage is not revenue, signups, or even leads captured. It's **completed audits that produce a shareable report**.
 
 Here's why:
 
@@ -14,7 +14,7 @@ Here's why:
 
 2. **Shareable reports = distribution.** Every shareable report is a potential acquisition channel. When a user forwards their audit to their CFO or posts it in Slack, that's organic reach we didn't pay for.
 
-3. **Leading indicator of revenue.** Users who complete audits and see meaningful savings ($500+/month) are the ones who convert to Credex consultations. But we can't optimize for consultations booked yet — we don't have enough volume. We can optimize for audit completion.
+3. **Leading indicator of revenue.** Users who complete audits and see meaningful savings ($500+/month) are the ones who convert to Ledgerly consultations. But we can't optimize for consultations booked yet — we don't have enough volume. We can optimize for audit completion.
 
 4. **Captures the full value loop.** The product is not "run an audit." The product is "run an audit, see results, share with stakeholders." The shareable report is the artifact that makes the tool useful beyond the moment of use.
 
@@ -132,7 +132,7 @@ If the audit engine fails, the user got zero value. This is a technical reliabil
 // Track successful audit generation
 analytics.track('Audit Completed', {
   audit_id: 'abc123',
-  share_url: 'credex.com/audit/abc123',
+  share_url: 'ledgerly.com/audit/abc123',
   total_savings_monthly: 450,
   total_savings_annual: 5400,
   recommendations_count: 3,
@@ -186,7 +186,7 @@ analytics.track('Audit Started from Shared Report', {
 ---
 
 ### High-Savings Consultation Booking Rate
-**Definition:** % of audits with $500+/month savings that book a Credex consultation
+**Definition:** % of audits with $500+/month savings that book a Ledgerly consultation
 
 **Target:** 10-15%
 

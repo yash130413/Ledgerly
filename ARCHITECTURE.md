@@ -1,8 +1,8 @@
-# Credex — System Architecture
+# Ledgerly — System Architecture
 
 ## Overview
 
-Credex is a production-grade AI spend optimization tool with a dual architecture: a **free public audit tool** (no login required) and an **optional authenticated dashboard** for power users.
+Ledgerly is a production-grade AI spend optimization tool with a dual architecture: a **free public audit tool** (no login required) and an **optional authenticated dashboard** for power users.
 
 The core audit functionality is completely public — users can run audits, see results, and share reports without creating an account. Authentication is only required for advanced features like audit history, team management, and recurring monitoring.
 
@@ -83,7 +83,7 @@ sequenceDiagram
 
 ## Audit Engine Architecture
 
-The audit engine is the core of Credex. It is entirely deterministic — no LLM is involved in generating the financial recommendations themselves.
+The audit engine is the core of Ledgerly. It is entirely deterministic — no LLM is involved in generating the financial recommendations themselves.
 
 ### Internal Flow
 
