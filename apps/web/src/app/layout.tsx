@@ -29,6 +29,14 @@ export const metadata: Metadata = {
     description: "Stop overpaying for AI APIs. Ledgerly audits your spend and surfaces savings.",
     images: ["/og-default.png"],
   },
+  icons: {
+    icon: [
+      { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png" }],
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

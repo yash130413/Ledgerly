@@ -56,8 +56,11 @@ export const siteMetadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
+    icon: [
+      { url: '/logo.svg', type: 'image/svg+xml' },
+      { url: '/icon.png', type: 'image/png' },
+    ],
+    shortcut: '/logo.svg',
     apple: '/apple-touch-icon.png',
   },
   manifest: '/site.webmanifest',

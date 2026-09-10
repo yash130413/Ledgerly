@@ -24,6 +24,14 @@ export function EmailLayout({ preview, children }: Props) {
         <Container style={styles.container}>
           {/* Logo / wordmark */}
           <Section style={styles.header}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/logo.svg`}
+              width={28}
+              height={28}
+              alt="Ledgerly"
+              style={styles.logoImg}
+            />
             <Text style={styles.logo}>Ledgerly</Text>
             <Text style={styles.logoSub}>AI Spend Optimization</Text>
           </Section>
@@ -72,6 +80,11 @@ const styles = {
   },
   header: {
     padding: "32px 40px 24px",
+  },
+  logoImg: {
+    display: "block",
+    marginBottom: "10px",
+    borderRadius: "8px",
   },
   logo: {
     fontSize: "22px",

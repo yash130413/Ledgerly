@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { analytics } from "@/lib/analytics";
+import { LedgerlyLogo } from "@/components/brand/ledgerly-logo";
 
 // Provider options
 const PROVIDERS = [
@@ -126,8 +127,11 @@ export default function AuditFormPage() {
       {/* Header */}
       <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-gray-900">
-            Ledgerly
+          <Link href="/">
+            <LedgerlyLogo
+              markClassName="size-7"
+              wordmarkClassName="font-bold text-xl"
+            />
           </Link>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Zap className="w-4 h-4 text-green-600" />

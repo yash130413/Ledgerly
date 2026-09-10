@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, Zap, Plug, Settings, LogOut, TrendingDown, Menu, X } from "lucide-react";
+import { BarChart3, Zap, Plug, Settings, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AnimateList, AnimateItem } from "@/components/shared/motion";
+import { LedgerlyLogo } from "@/components/brand/ledgerly-logo";
 
 const navItems = [
   { href: "/dashboard",    label: "Overview",      icon: BarChart3 },
@@ -53,10 +54,7 @@ function SidebarContent({ email, fullName, onNav }: SidebarProps & { onNav?: () 
         className="px-4 py-5 border-b border-gray-100"
       >
         <Link href="/" className="flex items-center gap-2">
-          <span className="w-7 h-7 rounded-xl bg-green-600 flex items-center justify-center shadow-sm">
-            <TrendingDown className="w-3.5 h-3.5 text-white" />
-          </span>
-          <span className="font-bold text-[15px] tracking-tight text-gray-900">Ledgerly</span>
+          <LedgerlyLogo wordmarkClassName="font-bold" />
         </Link>
       </motion.div>
 
@@ -137,10 +135,10 @@ export function Sidebar({ email, fullName }: SidebarProps) {
       <div className="md:hidden">
         <div className="fixed top-0 inset-x-0 z-40 h-14 flex items-center justify-between px-4 border-b border-gray-100 bg-white/95 backdrop-blur-xl shadow-sm">
           <Link href="/" className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-lg bg-green-600 flex items-center justify-center">
-              <TrendingDown className="w-3 h-3 text-white" />
-            </span>
-            <span className="font-bold text-sm tracking-tight text-gray-900">Ledgerly</span>
+            <LedgerlyLogo
+              markClassName="size-6"
+              wordmarkClassName="font-bold text-sm"
+            />
           </Link>
           <button
             onClick={() => setMobileOpen((v) => !v)}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { GitFork } from "lucide-react";
+import { LedgerlyLogo } from "@/components/brand/ledgerly-logo";
 
 const XIcon = () => (
   <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor" aria-hidden="true">
@@ -35,12 +36,7 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 flex flex-col gap-4">
             <Link href="/" className="flex items-center gap-2 w-fit">
-              <span className="w-7 h-7 rounded-xl bg-green-600 flex items-center justify-center shadow-sm">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                  <path d="M2 7h4M8 7h4M7 2v4M7 8v4" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-              </span>
-              <span className="font-semibold text-[15px] tracking-tight text-gray-900">Ledgerly</span>
+              <LedgerlyLogo />
             </Link>
             <p className="text-sm text-gray-500 leading-relaxed max-w-[220px]">
               AI spend auditing for engineering teams. Open source, built with Next.js.

@@ -13,80 +13,113 @@ export function GET() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "#0d0b14",
+          background: "#f8faf9",
           fontFamily: "system-ui, sans-serif",
           position: "relative",
         }}
       >
-        {/* Grid */}
         <div
           style={{
             position: "absolute",
             inset: 0,
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+              "linear-gradient(rgba(22,163,74,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(22,163,74,0.06) 1px, transparent 1px)",
             backgroundSize: "48px 48px",
           }}
         />
 
-        {/* Glow */}
         <div
           style={{
             position: "absolute",
-            top: "10%",
+            top: "8%",
             left: "50%",
             transform: "translateX(-50%)",
-            width: "700px",
-            height: "400px",
+            width: "720px",
+            height: "360px",
             borderRadius: "50%",
-            background: "radial-gradient(ellipse at center, rgba(124,101,246,0.2) 0%, transparent 70%)",
+            background:
+              "radial-gradient(ellipse at center, rgba(22,163,74,0.18) 0%, transparent 70%)",
           }}
         />
 
-        {/* Logo mark */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: "72px",
-            height: "72px",
-            borderRadius: "18px",
-            background: "#7c65f6",
-            marginBottom: "32px",
+            width: "84px",
+            height: "84px",
+            borderRadius: "22px",
+            background: "#16a34a",
+            marginBottom: "28px",
+            boxShadow: "0 12px 40px rgba(22,163,74,0.35)",
           }}
         >
-          <svg width="32" height="32" viewBox="0 0 14 14" fill="none">
-            <path d="M2 7h4M8 7h4M7 2v4M7 8v4" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+          <svg width="44" height="44" viewBox="0 0 32 32" fill="none">
+            <path
+              d="M8 7.5v17"
+              stroke="white"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+            <path
+              d="M11 10.5h5.5M11 14h4M11 17.5h5"
+              stroke="white"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeOpacity="0.55"
+            />
+            <rect x="18" y="10" width="3.4" height="12.5" rx="1" fill="white" />
+            <rect
+              x="22.2"
+              y="13.5"
+              width="3.4"
+              height="9"
+              rx="1"
+              fill="white"
+              fillOpacity="0.85"
+            />
+            <rect
+              x="26.4"
+              y="17"
+              width="3.4"
+              height="5.5"
+              rx="1"
+              fill="white"
+              fillOpacity="0.7"
+            />
+            <path
+              d="M18.5 22.8l1.7 1.7 3.5-3.6"
+              stroke="#bbf7d0"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </div>
 
-        {/* Wordmark */}
-        <div style={{ fontSize: "56px", fontWeight: 700, color: "white", letterSpacing: "-1.5px", marginBottom: "18px" }}>
+        <div
+          style={{
+            fontSize: "58px",
+            fontWeight: 700,
+            color: "#111827",
+            letterSpacing: "-1.5px",
+            marginBottom: "16px",
+          }}
+        >
           Ledgerly
         </div>
 
-        {/* Tagline */}
-        <div style={{ fontSize: "26px", color: "rgba(255,255,255,0.45)", fontWeight: 400, textAlign: "center", maxWidth: "640px" }}>
-          AI Spend Audit &amp; Optimization Platform
-        </div>
-
-        {/* Bottom pill */}
         <div
           style={{
-            position: "absolute",
-            bottom: "52px",
-            display: "flex",
-            alignItems: "center",
-            padding: "10px 24px",
-            borderRadius: "999px",
-            border: "1px solid rgba(255,255,255,0.1)",
-            background: "rgba(255,255,255,0.05)",
-            color: "rgba(255,255,255,0.5)",
-            fontSize: "18px",
+            fontSize: "26px",
+            color: "#4b5563",
+            fontWeight: 400,
+            textAlign: "center",
+            maxWidth: "640px",
           }}
         >
-          localhost:3000
+          AI Spend Audit &amp; Optimization Platform
         </div>
       </div>
     ),

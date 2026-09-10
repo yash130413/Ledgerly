@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { LedgerlyLogo } from "@/components/brand/ledgerly-logo";
 
 const links = [
   { href: "#features", label: "Features" },
@@ -39,12 +40,7 @@ export function Navbar() {
       >
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="w-7 h-7 rounded-xl bg-green-600 flex items-center justify-center shadow-sm">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M2 7h4M8 7h4M7 2v4M7 8v4" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
-            </svg>
-          </span>
-          <span className="font-semibold text-[15px] tracking-tight text-gray-900">Ledgerly</span>
+          <LedgerlyLogo />
         </Link>
 
         {/* Desktop links */}

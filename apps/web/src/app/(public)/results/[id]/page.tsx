@@ -9,6 +9,7 @@ import { ResultsLeadCapture } from "@/components/public/results-lead-capture";
 import { AlreadyOptimizedState } from "@/components/public/already-optimized-state";
 import { formatCurrency, cn } from "@/lib/utils";
 import type { PublicAuditSafe } from "@/types/database";
+import { LedgerlyLogo } from "@/components/brand/ledgerly-logo";
 
 // ── Metadata ──────────────────────────────────────────────────────────────────
 
@@ -102,7 +103,12 @@ export default async function ResultsPage({ params }: Props) {
         {/* Breadcrumb */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-xs text-gray-400">
-            <Link href="/" className="hover:text-gray-700 transition-colors">Ledgerly</Link>
+            <Link href="/" className="hover:opacity-80 transition-opacity">
+              <LedgerlyLogo
+                markClassName="size-5"
+                wordmarkClassName="text-xs font-semibold text-gray-700"
+              />
+            </Link>
             <span>/</span>
             <span className="text-gray-600 font-medium truncate max-w-[200px]">{audit.title}</span>
           </div>
