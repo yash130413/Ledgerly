@@ -52,6 +52,21 @@ function AnthropicLogo() {
   );
 }
 
+function CursorLogo() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+      <path
+        d="M4 3.5l16 7.2-7.1 2.1L10.7 20.5 4 3.5z"
+        fill="#111827"
+      />
+      <path
+        d="M12.9 12.8l6.1-1.8-4.4 6.6-1.7-4.8z"
+        fill="#4B5563"
+      />
+    </svg>
+  );
+}
+
 // ── Card config ───────────────────────────────────────────────────────────────
 
 type LogoCard = {
@@ -127,6 +142,18 @@ const LOGO_CARDS: LogoCard[] = [
     floatR: [-0.9, 0.6, -0.7, -0.9],
     duration: 9,
     delay: 2.2,
+  },
+  {
+    id: "cursor",
+    name: "Cursor",
+    Logo: CursorLogo,
+    glow: "rgba(17,24,39,0.08)",
+    border: "rgba(17,24,39,0.14)",
+    pos: { top: "72%", right: "1%" },
+    floatY: [0, -9, -3, 0],
+    floatR: [0.8, -0.6, 0.5, 0.8],
+    duration: 7.2,
+    delay: 1.2,
   },
 ];
 
