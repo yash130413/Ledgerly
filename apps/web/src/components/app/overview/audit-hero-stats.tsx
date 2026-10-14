@@ -7,6 +7,9 @@ import {
   Layers,
   Zap,
   ArrowUpRight,
+  BarChart3,
+  ShieldAlert,
+  Sparkles,
 } from "lucide-react";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { formatCurrency, cn } from "@/lib/utils";
@@ -164,6 +167,110 @@ function HeroStat({
   );
 }
 
+// ── Industry Peer Benchmark Card ─────────────────────────────────────────────
+function PeerBenchmarkCard({
+  benchmark,
+}: {
+  benchmark: NonNullable<AuditEngineResult["benchmark"]>;
+}) {
+  const isHigher = benchmark.percentDiff > 0;
+  const isCritical = benchmark.status === "critical";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98], delay: 0.28 }}
+      className={cn(
+        "relative rounded-2xl border overflow-hidden p-6 transition-colors duration-300",
+        isCritical
+          ? "border-amber-500/25 bg-gradient-to-br from-amber-950/15 via-card to-card"
+          : "border-white/[0.07] bg-card"
+      )}
+    >
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        {/* Left: Cohort & Narrative */}
+        <div className="flex flex-col gap-2.5 max-w-xl">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <BarChart3 className="w-3.5 h-3.5 text-indigo-400" aria-hidden="true" />
+              Industry Peer Benchmark
+            </span>
+            <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-foreground">
+              Cohort: {benchmark.cohortName}
+            </span>
+            <span
+              className={cn(
+                "text-[11px] font-bold px-2 py-0.5 rounded-full border",
+                isCritical
+                  ? "bg-red-500/10 text-red-400 border-red-500/20"
+                  : isHigher
+                  ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                  : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+              )}
+            >
+              {benchmark.percentDiff > 0
+                ? `+${benchmark.percentDiff}% vs Peers`
+                : `${benchmark.percentDiff}% vs Peers`}
+            </span>
+          </div>
+
+          <p className="text-sm font-medium text-foreground/90 leading-relaxed">
+            &ldquo;{benchmark.narrative}&rdquo;
+          </p>
+
+          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+            {isCritical ? (
+              <>
+                <ShieldAlert className="w-3.5 h-3.5 text-red-400 shrink-0" aria-hidden="true" />
+                <span>
+                  High Urgency: Top-quartile startups keep AI overhead below{" "}
+                  <strong className="text-foreground">${benchmark.peerAverage}/user/mo</strong>.
+                </span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0" aria-hidden="true" />
+                <span>Benchmark based on real startup AI spend data across {benchmark.cohortName}.</span>
+              </>
+            )}
+          </p>
+        </div>
+
+        {/* Right: Comparative Spend Metrics */}
+        <div className="flex items-center gap-6 shrink-0 bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-3.5">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+              Your Team
+            </span>
+            <span
+              className={cn(
+                "text-2xl font-bold tabular-nums",
+                isCritical ? "text-amber-400" : "text-foreground"
+              )}
+            >
+              ${benchmark.spendPerUser}
+            </span>
+            <span className="text-[10px] text-muted-foreground">/ dev / mo</span>
+          </div>
+
+          <div className="w-px h-10 bg-white/[0.08]" />
+
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+              Peer Average
+            </span>
+            <span className="text-2xl font-bold text-muted-foreground tabular-nums">
+              ${benchmark.peerAverage}
+            </span>
+            <span className="text-[10px] text-muted-foreground">/ dev / mo</span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 export function AuditHeroStats({ result }: { result: AuditEngineResult }) {
   const wastePercent =
@@ -313,6 +420,9 @@ export function AuditHeroStats({ result }: { result: AuditEngineResult }) {
           </div>
         </div>
       </motion.div>
+
+      {/* Peer benchmark comparison */}
+      {result.benchmark && <PeerBenchmarkCard benchmark={result.benchmark} />}
     </div>
   );
 }

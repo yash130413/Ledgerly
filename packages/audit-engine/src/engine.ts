@@ -3,8 +3,10 @@ import type {
   AuditEngineResult,
   AuditPriority,
   AuditProvider,
+  BenchmarkStatus,
   EffortImpact,
   EffortLevel,
+  IndustryBenchmark,
   WorkspaceMetrics,
 } from "./types";
 import { pricePerSeat } from "./enrich";
@@ -72,6 +74,8 @@ const EFFORT_MAP: Record<string, { effort: EffortLevel; time: string; owner: str
   API_SUB_OVERLAP:      { effort: "Medium",  time: "1 hr",   owner: "Engineering Lead" },
   PLATFORM_OVERLAP:     { effort: "Medium",  time: "1 hr",   owner: "Finance" },
   CROSS_TOOL_STACK:     { effort: "Medium",  time: "2 hrs",  owner: "CTO / VP Eng" },
+  MODEL_ROUTING:        { effort: "Medium",  time: "2 hrs",  owner: "Engineering Lead" },
+  BENCHMARK:            { effort: "Medium",  time: "1 hr",   owner: "Finance / Leadership" },
   // Contract renegotiation / strategic decisions
   ANNUAL_CONTRACT:      { effort: "High",    time: "2 hrs",  owner: "Finance" },
   PLAN_USECASE_MISFIT:  { effort: "High",    time: "2 hrs",  owner: "CTO / VP Eng" },
@@ -586,7 +590,115 @@ function runUniversalRules(
     }
   }
 
+  // Rule 8 — Smart Model Routing Recommendation
+  // If apiSpend > 500 and no model tiering is detected:
+  // ~60% of prompts are simple tasks that can be routed from flagship model to mini/flash/haiku,
+  // saving 80% on those queries (60% * 80% = 48% overall API savings).
+  if (m.apiSpend > 500 && !m.hasModelTiering) {
+    const flagshipModel =
+      m.provider === "Claude"
+        ? "Claude 3.5 Sonnet"
+        : m.provider === "Gemini"
+        ? "Gemini 1.5 Pro"
+        : "GPT-4o";
+    const lightModel =
+      m.provider === "Claude"
+        ? "Claude 3.5 Haiku"
+        : m.provider === "Gemini"
+        ? "Gemini 1.5 Flash"
+        : "GPT-4o-mini";
+
+    // 60% simple tasks × 80% cost reduction = 48% total API savings
+    const monthlySavings = Math.round(m.apiSpend * 0.6 * 0.8);
+    results.push(
+      rec({
+        provider: m.provider,
+        ruleId: `UNIVERSAL_MODEL_ROUTING_008_${m.provider.toUpperCase()}`,
+        title: `Smart Model Routing (${flagshipModel} → ${lightModel})`,
+        recommendation: `Route simple queries from ${flagshipModel} to ${lightModel}`,
+        reason: `Your team uses ${flagshipModel} for all queries ($${m.apiSpend.toLocaleString()}/mo). ~60% of prompts are simple tasks — switching those to ${lightModel} could save 80% on API costs ($${monthlySavings.toLocaleString()}/mo savings) without degrading quality.`,
+        confidenceScore: 88,
+        monthlySavings,
+        currentCost: m.apiSpend,
+        optimizedCost: m.apiSpend - monthlySavings,
+      })
+    );
+  }
+
   return results;
+}
+
+/**
+ * Compute an industry peer benchmark comparison based on team size and total AI spend.
+ * Benchmark data cohorts:
+ *  - 1–10 members: ~$20/dev/month (Early Stage)
+ *  - 11–50 devs: ~$28/dev/month (Growth Stage)
+ *  - 51–200 devs: ~$35/dev/month (Mid-market)
+ *  - 200+ devs: ~$42/dev/month (Enterprise)
+ */
+export function computeIndustryBenchmark(
+  workspaces: WorkspaceMetrics[]
+): IndustryBenchmark {
+  const totalSpend = workspaces.reduce((s, m) => s + m.monthlySpend, 0);
+
+  // Derive effective team size from workspace context or seat counts
+  const reportedTeamSize = workspaces.find((w) => w.teamSize && w.teamSize > 0)?.teamSize;
+  const maxSeats = Math.max(0, ...workspaces.map((w) => w.totalSeats || 0));
+  const teamSize = reportedTeamSize && reportedTeamSize > 0 ? reportedTeamSize : (maxSeats > 0 ? maxSeats : 10);
+
+  let cohortName: string;
+  let peerAverage: number;
+
+  if (teamSize <= 10) {
+    cohortName = "1–10 devs (Early Stage)";
+    peerAverage = 20;
+  } else if (teamSize <= 50) {
+    cohortName = "11–50 devs (Growth Stage)";
+    peerAverage = 28;
+  } else if (teamSize <= 200) {
+    cohortName = "51–200 devs (Mid-market)";
+    peerAverage = 35;
+  } else {
+    cohortName = "200+ devs (Enterprise)";
+    peerAverage = 42;
+  }
+
+  const spendPerUser = Math.round(totalSpend / Math.max(1, teamSize));
+  const diff = spendPerUser - peerAverage;
+  const percentDiff = peerAverage > 0 ? Math.round((diff / peerAverage) * 100) : 0;
+
+  let status: BenchmarkStatus;
+  let headline: string;
+
+  if (percentDiff > 40) {
+    status = "critical";
+    headline = `${percentDiff}% Above Peer Benchmark (High Waste)`;
+  } else if (percentDiff > 15) {
+    status = "above";
+    headline = `${percentDiff}% Above Peer Benchmark`;
+  } else if (percentDiff < -15) {
+    status = "below";
+    headline = `${Math.abs(percentDiff)}% Below Peer Benchmark (Lean Stack)`;
+  } else {
+    status = "optimal";
+    headline = "On Par With Industry Peer Benchmark";
+  }
+
+  const narrative =
+    percentDiff > 0
+      ? `Your team spends $${spendPerUser}/developer/month on AI tools, whereas companies of your size (${cohortName}) average $${peerAverage}/month.`
+      : `Your team spends $${spendPerUser}/developer/month on AI tools, comparing favorably to the peer average of $${peerAverage}/month for ${cohortName}.`;
+
+  return {
+    cohortName,
+    teamSize,
+    spendPerUser,
+    peerAverage,
+    percentDiff,
+    status,
+    headline,
+    narrative,
+  };
 }
 
 // ── Main engine entry point ───────────────────────────────────────────────────
@@ -640,6 +752,8 @@ export function runAuditEngine(workspaces: WorkspaceMetrics[]): AuditEngineResul
     Math.max(0, Math.min(100, (1 - wasteRatio) * 100))
   );
 
+  const benchmark = computeIndustryBenchmark(workspaces);
+
   return {
     recommendations: deduped,
     totalMonthlySavings,
@@ -650,5 +764,6 @@ export function runAuditEngine(workspaces: WorkspaceMetrics[]): AuditEngineResul
     providersScanned: [...new Set(deduped.map((r) => r.provider))],
     optimizationScore,
     generatedAt: new Date().toISOString(),
+    benchmark,
   };
 }

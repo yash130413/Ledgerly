@@ -12,9 +12,11 @@ export type {
   UserSegmentation,
   EffortLevel,
   EffortImpact,
+  BenchmarkStatus,
+  IndustryBenchmark,
 } from "./types";
 
-export { runAuditEngine } from "./engine";
+export { runAuditEngine, computeIndustryBenchmark } from "./engine";
 export { mapProviderId, mapWorkspacesToEngine } from "./mappers";
 export {
   buildAuditWorkspaces,

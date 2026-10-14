@@ -39,6 +39,28 @@ export interface EffortImpact {
   roiScore: number;
 }
 
+// ── Industry Peer Benchmarking ───────────────────────────────────────────────
+export type BenchmarkStatus = "below" | "optimal" | "above" | "critical";
+
+export interface IndustryBenchmark {
+  /** Range of team size for peer group (e.g. "1–10 members", "11–50 devs") */
+  cohortName: string;
+  /** Effective team size evaluated */
+  teamSize: number;
+  /** Company spend per user/developer per month */
+  spendPerUser: number;
+  /** Peer average spend per user per month */
+  peerAverage: number;
+  /** Percent difference (+45% means 45% above peer avg) */
+  percentDiff: number;
+  /** Spending status rating */
+  status: BenchmarkStatus;
+  /** High impact executive summary headline */
+  headline: string;
+  /** Explanatory narrative */
+  narrative: string;
+}
+
 export interface AuditRecommendation {
   id: string;
   provider: AuditProvider;
@@ -81,6 +103,8 @@ export interface WorkspaceMetrics {
   activitySource?: ActivitySource;
   /** 4-tier user segmentation breakdown */
   segmentation?: UserSegmentation;
+  /** Whether intelligent model tiering/prompt routing is already implemented */
+  hasModelTiering?: boolean;
 }
 
 export interface AuditEngineResult {
@@ -93,6 +117,8 @@ export interface AuditEngineResult {
   providersScanned: AuditProvider[];
   optimizationScore: number; // 0–100, higher = more waste found
   generatedAt: string;
+  /** Industry peer benchmark comparison against companies of similar team size */
+  benchmark?: IndustryBenchmark;
 }
 
 export interface AuditFormToolInput {

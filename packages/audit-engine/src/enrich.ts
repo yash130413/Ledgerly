@@ -227,7 +227,7 @@ export function buildAuditWorkspaces(
         avgSessionsPerUser: sessions,
         monthlySpend: spend,
         subscriptionSpend: spend,
-        apiSpend: t.plan?.toLowerCase() === "api" ? spend : 0,
+        apiSpend: t.plan?.toLowerCase().includes("api") ? spend : 0,
         powerUsers: seg.powerUsers,
         casualUsers: seg.casualUsers,
         duplicateTools: [],

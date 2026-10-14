@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { runAuditEngine } from "./engine";
+import { runAuditEngine, computeIndustryBenchmark } from "./engine";
 import type { WorkspaceMetrics } from "./types";
 
 // ── Shared factory ────────────────────────────────────────────────────────────
@@ -410,3 +410,86 @@ describe("4-tier segmentation rules", () => {
     expect(found!.affectedUsers).toBe(5);
   });
 });
+
+// ── 9. Smart Model Routing ───────────────────────────────────────────────────
+describe("smart model routing", () => {
+  it("triggers model routing recommendation when apiSpend > 500 and no tiering", () => {
+    const metrics = makeMetrics({
+      provider: "ChatGPT",
+      apiSpend: 1000,
+      monthlySpend: 1000,
+      hasModelTiering: false,
+    });
+    const result = runAuditEngine([metrics]);
+    const found = result.recommendations.find((r) =>
+      r.ruleId.startsWith("UNIVERSAL_MODEL_ROUTING_008_CHATGPT")
+    );
+
+    expect(found).toBeDefined();
+    // 60% simple * 80% cheaper = 48% of $1000 = $480/month
+    expect(found!.monthlySavings).toBe(480);
+    expect(found!.annualSavings).toBe(480 * 12);
+    expect(found!.title).toContain("GPT-4o → GPT-4o-mini");
+    expect(found!.reason).toContain("switching those to GPT-4o-mini could save 80% on API costs");
+    expect(found!.effortImpact?.effort).toBe("Medium");
+  });
+
+  it("does not trigger model routing if apiSpend <= 500", () => {
+    const metrics = makeMetrics({
+      provider: "ChatGPT",
+      apiSpend: 400,
+      hasModelTiering: false,
+    });
+    const result = runAuditEngine([metrics]);
+    const found = result.recommendations.find((r) =>
+      r.ruleId.startsWith("UNIVERSAL_MODEL_ROUTING_008")
+    );
+    expect(found).toBeUndefined();
+  });
+
+  it("does not trigger model routing if hasModelTiering is true", () => {
+    const metrics = makeMetrics({
+      provider: "ChatGPT",
+      apiSpend: 1200,
+      hasModelTiering: true,
+    });
+    const result = runAuditEngine([metrics]);
+    const found = result.recommendations.find((r) =>
+      r.ruleId.startsWith("UNIVERSAL_MODEL_ROUTING_008")
+    );
+    expect(found).toBeUndefined();
+  });
+});
+
+// ── 10. Industry Peer Benchmarking ───────────────────────────────────────────
+describe("industry peer benchmarking", () => {
+  it("evaluates peer benchmark for 11-50 devs cohort ($28/dev average)", () => {
+    const metrics = makeMetrics({
+      teamSize: 25,
+      monthlySpend: 1050, // 1050 / 25 = $42/dev/month
+    });
+    const benchmark = computeIndustryBenchmark([metrics]);
+
+    expect(benchmark.cohortName).toContain("11–50 devs");
+    expect(benchmark.spendPerUser).toBe(42);
+    expect(benchmark.peerAverage).toBe(28);
+    expect(benchmark.percentDiff).toBe(50); // (42 - 28) / 28 = +50%
+    expect(benchmark.status).toBe("critical");
+    expect(benchmark.narrative).toContain(
+      "Your team spends $42/developer/month on AI tools, whereas companies of your size"
+    );
+  });
+
+  it("attaches benchmark to AuditEngineResult", () => {
+    const metrics = makeMetrics({
+      teamSize: 10,
+      monthlySpend: 200, // 200 / 10 = $20/dev/month
+    });
+    const result = runAuditEngine([metrics]);
+
+    expect(result.benchmark).toBeDefined();
+    expect(result.benchmark!.spendPerUser).toBe(20);
+    expect(result.benchmark!.status).toBe("optimal");
+  });
+});
+
