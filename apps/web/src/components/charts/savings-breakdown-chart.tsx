@@ -37,6 +37,12 @@ export function SavingsBreakdownChart({ recommendations }: Props) {
     .map(([provider, savings]) => ({ provider, savings }))
     .sort((a, b) => b.savings - a.savings);
 
+  const formatCompact = (v: number) => {
+    if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
+    if (v >= 1_000) return `$${Math.round(v / 1_000)}k`;
+    return `$${v}`;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -64,7 +70,7 @@ export function SavingsBreakdownChart({ recommendations }: Props) {
       </div>
 
       <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }} barSize={32}>
+        <BarChart data={data} margin={{ top: 8, right: 8, left: -10, bottom: 0 }} barSize={32}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" vertical={false} />
           <XAxis
             dataKey="provider"
@@ -73,10 +79,11 @@ export function SavingsBreakdownChart({ recommendations }: Props) {
             axisLine={false}
           />
           <YAxis
+            width={52}
             tick={{ fontSize: 11, fill: "#94a3b8" }}
             tickLine={false}
             axisLine={false}
-            tickFormatter={(v) => `$${v}`}
+            tickFormatter={formatCompact}
           />
           <Tooltip
             cursor={{ fill: "rgba(0,0,0,0.04)" }}

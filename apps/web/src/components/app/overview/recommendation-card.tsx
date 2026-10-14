@@ -159,10 +159,15 @@ export function RecommendationCard({ rec, index }: { rec: AuditRecommendation; i
             <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 h-5 rounded-full", provider.badge)}>
               {rec.provider}
             </Badge>
-            {rec.affectedUsers != null && (
-              <span className="flex items-center gap-1 text-[10px] text-gray-400">
+            {rec.affectedUsers != null && rec.affectedUsers > 0 ? (
+              <span className="flex items-center gap-1 text-[10px] text-gray-500 font-medium">
                 <Users className="w-3 h-3" aria-hidden="true" />
-                {rec.affectedUsers} users
+                {rec.affectedUsers} seats
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 text-[10px] text-gray-500 font-medium">
+                <Layers className="w-3 h-3" aria-hidden="true" />
+                Stack-wide
               </span>
             )}
           </div>
@@ -197,51 +202,67 @@ export function RecommendationCard({ rec, index }: { rec: AuditRecommendation; i
             transition={{ duration: 0.25, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="overflow-hidden"
           >
-            <div className="px-5 pb-5 pt-4 border-t border-gray-100 flex flex-col gap-5">
+            <div className="px-5 pb-5 pt-4 border-t border-gray-100 flex flex-col gap-4">
 
               <div className="sm:hidden">
                 <ConfidenceBar score={rec.confidenceScore} index={index} />
               </div>
 
+              {/* Action Recommendation Banner */}
+              <div className="rounded-xl bg-emerald-50/80 border border-emerald-200/70 p-3.5 flex items-start gap-3">
+                <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Action Required</span>
+                  <p className="text-xs text-emerald-950 font-semibold leading-relaxed">{rec.recommendation}</p>
+                </div>
+              </div>
+
               {rec.currentCost != null && rec.optimizedCost != null && (
                 <div className="flex items-center gap-2 flex-wrap">
-                  <div className="rounded-xl bg-gray-50 border border-gray-100 px-4 py-3 flex flex-col gap-0.5 min-w-[100px]">
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wider">Current</span>
+                  <div className="rounded-xl bg-gray-50 border border-gray-100 px-4 py-2.5 flex flex-col gap-0.5 min-w-[100px]">
+                    <span className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Current</span>
                     <span className="text-sm font-semibold text-gray-900 tabular-nums">{formatCurrency(rec.currentCost)}/mo</span>
                   </div>
 
                   <ArrowRight className="w-3.5 h-3.5 text-gray-300 shrink-0" aria-hidden="true" />
 
-                  <div className="rounded-xl bg-green-50 border border-green-100 px-4 py-3 flex flex-col gap-0.5 min-w-[100px]">
-                    <span className="text-[10px] text-green-600/70 uppercase tracking-wider">Optimized</span>
+                  <div className="rounded-xl bg-green-50 border border-green-100 px-4 py-2.5 flex flex-col gap-0.5 min-w-[100px]">
+                    <span className="text-[10px] text-green-600/70 uppercase tracking-wider font-medium">Optimized</span>
                     <span className="text-sm font-semibold text-green-700 tabular-nums">{formatCurrency(rec.optimizedCost)}/mo</span>
                   </div>
 
                   {savingsPct !== null && (
-                    <div className="rounded-xl bg-gray-50 border border-gray-100 px-4 py-3 flex flex-col gap-0.5">
-                      <span className="text-[10px] text-gray-400 uppercase tracking-wider">Reduction</span>
+                    <div className="rounded-xl bg-gray-50 border border-gray-100 px-4 py-2.5 flex flex-col gap-0.5">
+                      <span className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Reduction</span>
                       <span className="text-sm font-semibold text-green-600">{savingsPct}%</span>
                     </div>
                   )}
 
-                  {rec.affectedUsers != null && (
-                    <div className="rounded-xl bg-gray-50 border border-gray-100 px-4 py-3 flex flex-col gap-0.5">
-                      <span className="text-[10px] text-gray-400 uppercase tracking-wider">Affected</span>
-                      <span className="text-sm font-semibold text-gray-900">{rec.affectedUsers} users</span>
-                    </div>
-                  )}
+                  <div className="rounded-xl bg-gray-50 border border-gray-100 px-4 py-2.5 flex flex-col gap-0.5">
+                    <span className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Scope</span>
+                    <span className="text-sm font-semibold text-gray-900">
+                      {rec.affectedUsers != null && rec.affectedUsers > 0
+                        ? `${rec.affectedUsers} seats`
+                        : "Stack-wide"}
+                    </span>
+                  </div>
                 </div>
               )}
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 rounded-xl bg-gray-50/80 border border-gray-100 p-3.5">
                 <div className="flex items-center gap-1.5">
-                  <TrendingDown className="w-3 h-3 text-gray-400" aria-hidden="true" />
-                  <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Reasoning</span>
+                  <TrendingDown className="w-3.5 h-3.5 text-gray-500" aria-hidden="true" />
+                  <span className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Why this was flagged (Reasoning)</span>
                 </div>
-                <p className="text-sm text-gray-500 leading-relaxed pl-4 border-l-2 border-gray-100">{rec.reason}</p>
+                <p className="text-xs text-gray-700 leading-relaxed font-normal">{rec.reason}</p>
               </div>
 
-              <code className="text-[10px] font-mono text-gray-300 self-start">{rec.ruleId}</code>
+              <div className="flex items-center justify-between pt-1">
+                <code className="text-[10px] font-mono text-gray-400">{rec.ruleId}</code>
+                <span className="text-[10px] text-gray-400 font-medium">Deterministic Rule Match</span>
+              </div>
             </div>
           </motion.div>
         )}

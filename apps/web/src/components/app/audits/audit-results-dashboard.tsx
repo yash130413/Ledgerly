@@ -91,7 +91,7 @@ export function AuditResultsDashboard({ result, workspaces }: Props) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.3 }}
-        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
+        className="flex flex-wrap items-stretch gap-3"
       >
         {providerSummary.map(({ provider, count, savings }) => {
           const isActive = providerFilter === provider;
@@ -101,7 +101,7 @@ export function AuditResultsDashboard({ result, workspaces }: Props) {
               key={provider}
               onClick={() => setProviderFilter(isActive ? "All" : provider)}
               className={cn(
-                "group rounded-xl border px-4 py-3 flex flex-col gap-2 text-left transition-all duration-200",
+                "group rounded-xl border px-4 py-3 flex flex-col gap-2 text-left transition-all duration-200 min-w-[180px] max-w-[260px] flex-1",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
                 isActive
                   ? "border-white/20 bg-white/[0.07] shadow-sm"
