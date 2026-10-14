@@ -8,6 +8,10 @@ export type {
   AuditEngineResult,
   AuditFormToolInput,
   AuditFormContext,
+  UserSegmentTier,
+  UserSegmentation,
+  EffortLevel,
+  EffortImpact,
 } from "./types";
 
 export { runAuditEngine } from "./engine";
@@ -15,6 +19,7 @@ export { mapProviderId, mapWorkspacesToEngine } from "./mappers";
 export {
   buildAuditWorkspaces,
   estimateActiveSeats,
+  segmentUsers,
   pricePerSeat,
   PLAN_PRICE_PER_SEAT,
   isAnnualCommitmentPlan,

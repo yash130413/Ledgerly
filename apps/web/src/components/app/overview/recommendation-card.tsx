@@ -14,11 +14,21 @@ import {
   AlertTriangle,
   TrendingDown,
   Layers,
+  Clock,
+  Zap,
+  UserCheck,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, cn } from "@/lib/utils";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
-import type { AuditRecommendation, AuditPriority, AuditProvider } from "@ledgerly/audit-engine";
+import type { AuditRecommendation, AuditPriority, AuditProvider, EffortLevel } from "@ledgerly/audit-engine";
+
+const EFFORT_STYLES: Record<EffortLevel, { bg: string; text: string; label: string }> = {
+  Trivial: { bg: "bg-green-50",  text: "text-green-700",  label: "⚡ Trivial" },
+  Low:     { bg: "bg-blue-50",   text: "text-blue-700",   label: "🟢 Low" },
+  Medium:  { bg: "bg-yellow-50", text: "text-yellow-700", label: "🟡 Medium" },
+  High:    { bg: "bg-red-50",    text: "text-red-700",    label: "🔴 High" },
+};
 
 const PRIORITY_CONFIG: Record<
   AuditPriority,
@@ -218,6 +228,35 @@ export function RecommendationCard({ rec, index }: { rec: AuditRecommendation; i
                   <p className="text-xs text-emerald-950 font-semibold leading-relaxed">{rec.recommendation}</p>
                 </div>
               </div>
+
+              {/* Effort vs Impact Badge */}
+              {rec.effortImpact && (
+                <div className="rounded-xl bg-slate-50/80 border border-slate-200/70 p-3.5 flex items-start sm:items-center gap-3 flex-col sm:flex-row">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={cn(
+                      "inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full border",
+                      EFFORT_STYLES[rec.effortImpact.effort].bg,
+                      EFFORT_STYLES[rec.effortImpact.effort].text,
+                    )}>
+                      {EFFORT_STYLES[rec.effortImpact.effort].label} effort
+                    </span>
+                    <span className="flex items-center gap-1 text-[11px] text-gray-500 font-medium">
+                      <Clock className="w-3 h-3" aria-hidden="true" />
+                      {rec.effortImpact.estimatedTime}
+                    </span>
+                    <span className="flex items-center gap-1 text-[11px] text-gray-500 font-medium">
+                      <UserCheck className="w-3 h-3" aria-hidden="true" />
+                      {rec.effortImpact.owner}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 sm:ml-auto">
+                    <Zap className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
+                    <span className="text-[11px] font-bold text-gray-700">
+                      {rec.effortImpact.estimatedTime} → {formatCurrency(rec.annualSavings)}/yr
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {rec.currentCost != null && rec.optimizedCost != null && (
                 <div className="flex items-center gap-2 flex-wrap">

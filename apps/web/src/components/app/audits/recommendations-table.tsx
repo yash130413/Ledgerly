@@ -4,7 +4,14 @@ import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, cn } from "@/lib/utils";
-import type { AuditRecommendation, AuditPriority, AuditProvider } from "@ledgerly/audit-engine";
+import type { AuditRecommendation, AuditPriority, AuditProvider, EffortLevel } from "@ledgerly/audit-engine";
+
+const EFFORT_PILL: Record<EffortLevel, string> = {
+  Trivial: "bg-green-50 text-green-700 border-green-200",
+  Low:     "bg-blue-50 text-blue-700 border-blue-200",
+  Medium:  "bg-yellow-50 text-yellow-700 border-yellow-200",
+  High:    "bg-red-50 text-red-700 border-red-200",
+};
 
 const PRIORITY_STYLES: Record<AuditPriority, string> = {
   Critical: "bg-red-50 text-red-600 border-red-200",
@@ -91,11 +98,24 @@ function RecommendationRow({ rec }: { rec: AuditRecommendation }) {
           </span>
           {rec.affectedUsers != null && <span className="text-xs text-gray-400 block">users</span>}
         </td>
+
+        <td className="px-3 py-3.5 whitespace-nowrap hidden xl:table-cell">
+          {rec.effortImpact ? (
+            <div className="flex flex-col gap-0.5">
+              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full w-fit", EFFORT_PILL[rec.effortImpact.effort])}>
+                {rec.effortImpact.effort}
+              </Badge>
+              <span className="text-[10px] text-gray-400">{rec.effortImpact.estimatedTime}</span>
+            </div>
+          ) : (
+            <span className="text-xs text-gray-300">—</span>
+          )}
+        </td>
       </tr>
 
       {expanded && (
         <tr className="bg-gray-50/60 border-b border-gray-100">
-          <td colSpan={8} className="px-10 py-4">
+          <td colSpan={9} className="px-10 py-4">
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
               {rec.currentCost != null && (
                 <div className="flex flex-col gap-1">
@@ -119,6 +139,18 @@ function RecommendationRow({ rec }: { rec: AuditRecommendation }) {
                 <span className="text-xs text-gray-400 uppercase tracking-wider font-medium">Rule ID</span>
                 <code className="text-xs font-mono text-gray-400 bg-gray-100 px-2 py-1 rounded-lg w-fit">{rec.ruleId}</code>
               </div>
+              {rec.effortImpact && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-gray-400 uppercase tracking-wider font-medium">Owner</span>
+                  <span className="text-sm font-semibold text-gray-900">{rec.effortImpact.owner}</span>
+                </div>
+              )}
+              {rec.effortImpact && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-gray-400 uppercase tracking-wider font-medium">ROI Score</span>
+                  <span className="text-sm font-semibold text-green-600">{formatCurrency(rec.effortImpact.roiScore)}/hr</span>
+                </div>
+              )}
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-xs text-gray-400 uppercase tracking-wider font-medium">Reasoning</span>
@@ -162,6 +194,7 @@ export function RecommendationsTable({ recommendations }: { recommendations: Aud
               <Th className="text-right">Monthly</Th>
               <Th className="text-right hidden lg:table-cell">Annual</Th>
               <Th className="text-right hidden xl:table-cell">Users</Th>
+              <Th className="hidden xl:table-cell">Effort</Th>
             </tr>
           </thead>
           <tbody>

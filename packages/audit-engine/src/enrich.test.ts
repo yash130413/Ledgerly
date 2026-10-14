@@ -3,6 +3,7 @@ import {
   buildAuditWorkspaces,
   estimateActiveSeats,
   pricePerSeat,
+  segmentUsers,
 } from "./enrich";
 
 describe("estimateActiveSeats", () => {
@@ -77,5 +78,35 @@ describe("pricePerSeat", () => {
   it("returns published plan prices", () => {
     expect(pricePerSeat("ChatGPT", "Team")).toBe(30);
     expect(pricePerSeat("Copilot", "Business")).toBe(19);
+  });
+});
+
+describe("segmentUsers", () => {
+  it("segments total seats across zombie, casual, regular, and power tiers", () => {
+    const seg = segmentUsers({
+      totalSeats: 20,
+      activeSeats: 12,
+      inactiveSeats: 8,
+      provider: "ChatGPT",
+      plan: "Team",
+      useCase: "Coding",
+    });
+
+    // Sum must equal total seats
+    const total = seg.zombieUsers + seg.casualUsers + seg.regularUsers + seg.powerUsers;
+    expect(total).toBe(20);
+    // Inactive seats produce zombie users
+    expect(seg.zombieUsers).toBeGreaterThan(0);
+    expect(seg.powerUsers).toBeGreaterThan(0);
+  });
+
+  it("handles 0 seats gracefully", () => {
+    const seg = segmentUsers({
+      totalSeats: 0,
+      activeSeats: 0,
+      inactiveSeats: 0,
+      provider: "ChatGPT",
+    });
+    expect(seg).toEqual({ zombieUsers: 0, casualUsers: 0, regularUsers: 0, powerUsers: 0 });
   });
 });

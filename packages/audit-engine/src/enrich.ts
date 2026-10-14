@@ -4,6 +4,7 @@ import type {
   AuditFormToolInput,
   AuditProvider,
   AuditUseCase,
+  UserSegmentation,
   WorkspaceMetrics,
 } from "./types";
 import { mapProviderId } from "./mappers";
@@ -111,6 +112,58 @@ function usageIntensity(
 }
 
 /**
+ * Segment all seats into 4 usage tiers:
+ *  - zombie:  0 activity in 60+ days (subset of inactive — the worst offenders)
+ *  - casual:  <5 prompts/week estimated (~low occasional use)
+ *  - regular: 5–30 prompts/week (healthy, standard usage)
+ *  - power:   30+ prompts/week (heavy, justify premium tiers)
+ *
+ * When real activity data isn't available, we estimate tier distribution
+ * from utilization rate, use-case fit, and plan tier.
+ */
+export function segmentUsers(input: {
+  totalSeats: number;
+  activeSeats: number;
+  inactiveSeats: number;
+  provider: AuditProvider;
+  plan?: string;
+  useCase?: string;
+}): UserSegmentation {
+  const { totalSeats, activeSeats, inactiveSeats, provider, plan, useCase } = input;
+  if (totalSeats <= 0) return { zombieUsers: 0, casualUsers: 0, regularUsers: 0, powerUsers: 0 };
+
+  // Zombie = ~60% of inactive seats (the truly abandoned ones)
+  const zombieUsers = Math.round(inactiveSeats * 0.6);
+  // Remaining inactive are "casual-inactive" — they opened it once or twice
+  const semiInactive = inactiveSeats - zombieUsers;
+
+  // Among active seats, split by use-case fit:
+  //   High fit → more power users, fewer casual
+  //   Low fit  → more casual, fewer power
+  const fit = useCaseFit(useCase, provider);
+  const planBoost = isAnnualCommitmentPlan(plan) ? 0.05 : 0;
+  const powerRatio = clamp(0.15 + fit * 0.3 + planBoost, 0.1, 0.5);
+  const casualRatio = clamp(0.4 - fit * 0.2, 0.1, 0.45);
+  // regularRatio is the remainder
+
+  const powerUsers = Math.max(activeSeats > 0 ? 1 : 0, Math.round(activeSeats * powerRatio));
+  const casualFromActive = Math.round(activeSeats * casualRatio);
+  const regularUsers = Math.max(0, activeSeats - powerUsers - casualFromActive);
+  const casualUsers = casualFromActive + semiInactive;
+
+  // Sanity: ensure total matches
+  const sum = zombieUsers + casualUsers + regularUsers + powerUsers;
+  const diff = totalSeats - sum;
+  // Absorb rounding error into casual tier
+  return {
+    zombieUsers,
+    casualUsers: Math.max(0, casualUsers + diff),
+    regularUsers,
+    powerUsers,
+  };
+}
+
+/**
  * Build engine-ready workspaces from free-audit form tools.
  * - Prefers reported activeSeats when provided (step 1: real-ish usage)
  * - Else estimates from team size / plan / use case (not blind 70/30)
@@ -153,8 +206,16 @@ export function buildAuditWorkspaces(
       }
 
       const { prompts, sessions } = usageIntensity(provider, ctx.useCase);
-      const powerUsers = Math.max(1, Math.round(active * 0.35));
-      const casualUsers = Math.max(0, active - powerUsers);
+
+      // 4-tier segmentation
+      const seg = segmentUsers({
+        totalSeats: seats,
+        activeSeats: active,
+        inactiveSeats: inactive,
+        provider,
+        plan: t.plan,
+        useCase: ctx.useCase,
+      });
 
       return {
         provider,
@@ -167,14 +228,15 @@ export function buildAuditWorkspaces(
         monthlySpend: spend,
         subscriptionSpend: spend,
         apiSpend: t.plan?.toLowerCase() === "api" ? spend : 0,
-        powerUsers,
-        casualUsers,
+        powerUsers: seg.powerUsers,
+        casualUsers: seg.casualUsers,
         duplicateTools: [],
         utilizationRate: seats > 0 ? active / seats : 0,
         annualCommitment: isAnnualCommitmentPlan(t.plan),
         teamSize: ctx.teamSize,
         useCase: ctx.useCase,
         activitySource,
+        segmentation: seg,
       };
     })
     .filter((w): w is WorkspaceMetrics => w != null);

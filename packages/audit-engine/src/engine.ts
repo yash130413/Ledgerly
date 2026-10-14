@@ -3,6 +3,8 @@ import type {
   AuditEngineResult,
   AuditPriority,
   AuditProvider,
+  EffortImpact,
+  EffortLevel,
   WorkspaceMetrics,
 } from "./types";
 import { pricePerSeat } from "./enrich";
@@ -49,9 +51,63 @@ function activityNote(m: WorkspaceMetrics): string {
     : "based on estimated activity from team size, plan, and use case";
 }
 
+// ── Effort vs Impact scoring ────────────────────────────────────────────────
+// Maps ruleId patterns to effort metadata. The engine assigns effort/impact
+// to every recommendation so frontends can show "5 min → $3,600/yr" badges.
+const EFFORT_MAP: Record<string, { effort: EffortLevel; time: string; owner: string }> = {
+  // Seat removal / reclaim rules — trivial IT admin tasks
+  INACTIVE_SEATS:       { effort: "Trivial", time: "5 min",  owner: "IT Admin" },
+  ZOMBIE_SEATS:         { effort: "Trivial", time: "5 min",  owner: "IT Admin" },
+  LOW_UTILIZATION:      { effort: "Trivial", time: "5 min",  owner: "IT Admin" },
+  SEATS_EXCEED_TEAM:    { effort: "Trivial", time: "5 min",  owner: "IT Admin" },
+  LOW_ACTIVITY:         { effort: "Trivial", time: "5 min",  owner: "IT Admin" },
+  // Downgrade / plan change rules — need team review
+  CASUAL_DOWNGRADE:     { effort: "Low",     time: "15 min", owner: "Team Lead" },
+  TEAM_PLAN:            { effort: "Low",     time: "15 min", owner: "Finance" },
+  POWER_USER:           { effort: "Low",     time: "15 min", owner: "Team Lead" },
+  WORKSPACE_UNDERUTIL:  { effort: "Low",     time: "15 min", owner: "IT Admin" },
+  // Consolidation / vendor negotiation — medium effort
+  VENDOR_CONSOLIDATION: { effort: "Medium",  time: "1 hr",   owner: "Finance" },
+  REDUNDANCY:           { effort: "Medium",  time: "1 hr",   owner: "Engineering Lead" },
+  API_SUB_OVERLAP:      { effort: "Medium",  time: "1 hr",   owner: "Engineering Lead" },
+  PLATFORM_OVERLAP:     { effort: "Medium",  time: "1 hr",   owner: "Finance" },
+  CROSS_TOOL_STACK:     { effort: "Medium",  time: "2 hrs",  owner: "CTO / VP Eng" },
+  // Contract renegotiation / strategic decisions
+  ANNUAL_CONTRACT:      { effort: "High",    time: "2 hrs",  owner: "Finance" },
+  PLAN_USECASE_MISFIT:  { effort: "High",    time: "2 hrs",  owner: "CTO / VP Eng" },
+};
+
+/** Effort hours for ROI calculation */
+const EFFORT_HOURS: Record<EffortLevel, number> = {
+  Trivial: 0.1,
+  Low: 0.25,
+  Medium: 1,
+  High: 2,
+};
+
+function deriveEffortImpact(ruleId: string, annualSavings: number): EffortImpact {
+  // Find matching effort entry by checking if ruleId contains the key
+  const matchKey = Object.keys(EFFORT_MAP).find((key) =>
+    ruleId.toUpperCase().includes(key)
+  );
+  const meta = matchKey
+    ? EFFORT_MAP[matchKey]
+    : { effort: "Medium" as EffortLevel, time: "30 min", owner: "Team Lead" };
+
+  const hours = EFFORT_HOURS[meta.effort];
+  const roiScore = hours > 0 ? Math.round(annualSavings / hours) : annualSavings;
+
+  return {
+    effort: meta.effort,
+    estimatedTime: meta.time,
+    owner: meta.owner,
+    roiScore,
+  };
+}
+
 // ── Helper: build a recommendation ──────────────────────────────────────────
 function rec(
-  partial: Omit<AuditRecommendation, "id" | "priority" | "annualSavings"> & {
+  partial: Omit<AuditRecommendation, "id" | "priority" | "annualSavings" | "effortImpact"> & {
     monthlySavings: number;
   }
 ): AuditRecommendation {
@@ -61,6 +117,7 @@ function rec(
     id: nextId(),
     annualSavings,
     priority: derivePriority(annualSavings),
+    effortImpact: deriveEffortImpact(partial.ruleId, annualSavings),
   };
 }
 
@@ -484,6 +541,49 @@ function runUniversalRules(
         optimizedCost: totalSpend - monthlySavings,
       })
     );
+  }
+
+  // Rule 6 — Zombie seats (60+ days zero activity — immediate reclaim)
+  const seg = m.segmentation;
+  if (seg && seg.zombieUsers >= 2) {
+    const monthlySavings = seg.zombieUsers * pps;
+    results.push(
+      rec({
+        provider: m.provider,
+        ruleId: `UNIVERSAL_ZOMBIE_SEATS_006_${m.provider.toUpperCase()}`,
+        title: `${seg.zombieUsers} Zombie ${m.provider} Licenses (60+ Days Inactive)`,
+        recommendation: `Immediately reclaim ${seg.zombieUsers} abandoned ${m.provider} licenses`,
+        reason: `${seg.zombieUsers} users have shown zero activity for over 60 days (${activityNote(m)}). These are "ghost licenses" — the users have likely left the team, switched tools, or never onboarded. Reclaiming these seats is a zero-risk, immediate cost reduction.`,
+        confidenceScore: 96,
+        monthlySavings,
+        affectedUsers: seg.zombieUsers,
+        currentCost: m.monthlySpend,
+        optimizedCost: m.monthlySpend - monthlySavings,
+      })
+    );
+  }
+
+  // Rule 7 — Casual user downgrade opportunity
+  if (seg && seg.casualUsers >= 2 && pps > 10) {
+    // Casual users can often move to Free or a cheaper tier
+    const cheaperPrice = Math.min(pps, 10); // assume $10 or free tier available
+    const monthlySavings = seg.casualUsers * Math.max(0, pps - cheaperPrice);
+    if (monthlySavings > 0) {
+      results.push(
+        rec({
+          provider: m.provider,
+          ruleId: `UNIVERSAL_CASUAL_DOWNGRADE_007_${m.provider.toUpperCase()}`,
+          title: `${seg.casualUsers} Casual ${m.provider} Users on Premium Plan`,
+          recommendation: `Downgrade ${seg.casualUsers} low-usage users to a lighter ${m.provider} plan`,
+          reason: `${seg.casualUsers} users average fewer than 5 prompts per week (${activityNote(m)}). At $${pps}/seat on the ${m.plan || "current"} plan, these users would be better served by a Free or lower-cost tier, saving $${Math.max(0, pps - cheaperPrice)}/seat/month without impacting their workflow.`,
+          confidenceScore: 82,
+          monthlySavings,
+          affectedUsers: seg.casualUsers,
+          currentCost: seg.casualUsers * pps,
+          optimizedCost: seg.casualUsers * cheaperPrice,
+        })
+      );
+    }
   }
 
   return results;

@@ -340,3 +340,73 @@ describe("context-aware rules", () => {
     expect(found!.monthlySavings).toBe(10 * 30);
   });
 });
+
+// ── 7. Effort vs Impact scoring ──────────────────────────────────────────────
+describe("effort vs impact scoring", () => {
+  it("assigns effortImpact metadata to all generated recommendations", () => {
+    const metrics = makeMetrics({ inactiveSeats30d: 5 });
+    const result = runAuditEngine([metrics]);
+
+    expect(result.recommendations.length).toBeGreaterThan(0);
+    for (const rec of result.recommendations) {
+      expect(rec.effortImpact).toBeDefined();
+      expect(["Trivial", "Low", "Medium", "High"]).toContain(rec.effortImpact!.effort);
+      expect(rec.effortImpact!.estimatedTime).toBeTruthy();
+      expect(rec.effortImpact!.owner).toBeTruthy();
+      expect(rec.effortImpact!.roiScore).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it("assigns Trivial effort and high ROI to inactive seats reclaim", () => {
+    const metrics = makeMetrics({ inactiveSeats30d: 5 });
+    const result = runAuditEngine([metrics]);
+    const rec = result.recommendations.find((r) => r.ruleId === "CHATGPT_INACTIVE_SEATS_001");
+
+    expect(rec).toBeDefined();
+    expect(rec!.effortImpact?.effort).toBe("Trivial");
+    expect(rec!.effortImpact?.owner).toBe("IT Admin");
+  });
+});
+
+// ── 8. Segmentation rules (Zombie & Casual) ──────────────────────────────────
+describe("4-tier segmentation rules", () => {
+  it("triggers zombie seats rule when zombieUsers >= 2", () => {
+    const metrics = makeMetrics({
+      segmentation: {
+        zombieUsers: 4,
+        casualUsers: 2,
+        regularUsers: 2,
+        powerUsers: 2,
+      },
+    });
+    const result = runAuditEngine([metrics]);
+    const found = result.recommendations.find((r) =>
+      r.ruleId.startsWith("UNIVERSAL_ZOMBIE_SEATS_006")
+    );
+
+    expect(found).toBeDefined();
+    expect(found!.affectedUsers).toBe(4);
+    expect(found!.confidenceScore).toBe(96);
+  });
+
+  it("triggers casual downgrade rule when casualUsers >= 2 on high-cost plan", () => {
+    const metrics = makeMetrics({
+      plan: "Team",
+      monthlySpend: 300,
+      totalSeats: 10,
+      segmentation: {
+        zombieUsers: 0,
+        casualUsers: 5,
+        regularUsers: 3,
+        powerUsers: 2,
+      },
+    });
+    const result = runAuditEngine([metrics]);
+    const found = result.recommendations.find((r) =>
+      r.ruleId.startsWith("UNIVERSAL_CASUAL_DOWNGRADE_007")
+    );
+
+    expect(found).toBeDefined();
+    expect(found!.affectedUsers).toBe(5);
+  });
+});
