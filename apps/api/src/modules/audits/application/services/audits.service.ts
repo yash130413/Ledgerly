@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
+  buildAuditWorkspaces,
   mapWorkspacesToEngine,
   runAuditEngine,
   type AuditEngineResult,
@@ -20,6 +21,47 @@ import type {
 } from '../../../../types/database';
 
 const NIL_UUID = '00000000-0000-0000-0000-000000000000';
+
+/** Free-audit form sends plan + seats without precomputed utilization. */
+function looksLikeFormTools(raw: Array<Record<string, unknown>>): boolean {
+  if (raw.length === 0) return false;
+  return raw.every(
+    (w) =>
+      typeof w.plan === 'string' &&
+      w.seats != null &&
+      w.utilizationRate == null &&
+      w.activeSeats30d == null,
+  );
+}
+
+function resolveWorkspaces(
+  raw: unknown[],
+  ctx: { teamSize?: number; useCase?: string },
+): WorkspaceMetrics[] {
+  const records = raw as Array<Record<string, unknown>>;
+  if (looksLikeFormTools(records)) {
+    return buildAuditWorkspaces(
+      records.map((w) => ({
+        provider: String(w.provider ?? ''),
+        plan: String(w.plan ?? ''),
+        monthlySpend: Number(w.monthlySpend ?? 0),
+        seats: Number(w.seats ?? w.totalSeats ?? 1),
+        activeSeats:
+          typeof w.activeSeats === 'number'
+            ? w.activeSeats
+            : typeof w.activeSeats === 'string' && w.activeSeats !== ''
+              ? Number(w.activeSeats)
+              : undefined,
+      })),
+      { teamSize: ctx.teamSize, useCase: ctx.useCase },
+    );
+  }
+  return mapWorkspacesToEngine(records).map((w) => ({
+    ...w,
+    teamSize: w.teamSize ?? ctx.teamSize,
+    useCase: w.useCase ?? ctx.useCase,
+  }));
+}
 
 @Injectable()
 export class AuditsService {
@@ -43,9 +85,10 @@ export class AuditsService {
       origin?: string;
     },
   ) {
-    const workspaces = mapWorkspacesToEngine(
-      dto.workspaces as Array<Record<string, unknown>>,
-    );
+    const workspaces = resolveWorkspaces(dto.workspaces, {
+      teamSize: dto.teamSize,
+      useCase: dto.useCase,
+    });
     const result = runAuditEngine(workspaces);
     const { summary, source: summarySource } = await this.ai.summarizeAudit(
       dto.title,
@@ -82,9 +125,10 @@ export class AuditsService {
   }
 
   async createPublic(dto: PublicAuditDto, originHeader?: string) {
-    const workspaces = mapWorkspacesToEngine(
-      dto.workspaces as Array<Record<string, unknown>>,
-    );
+    const workspaces = resolveWorkspaces(dto.workspaces, {
+      teamSize: dto.teamSize,
+      useCase: dto.useCase,
+    });
     const result = runAuditEngine(workspaces);
     const title = `AI Spend Audit - ${new Date().toLocaleDateString()}`;
 

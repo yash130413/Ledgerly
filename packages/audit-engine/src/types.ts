@@ -2,6 +2,15 @@ export type AuditProvider = "ChatGPT" | "Claude" | "Cursor" | "Copilot" | "Gemin
 
 export type AuditPriority = "Low" | "Medium" | "High" | "Critical";
 
+export type AuditUseCase =
+  | "Coding"
+  | "Writing"
+  | "Data Analysis"
+  | "Research"
+  | "Mixed";
+
+export type ActivitySource = "reported" | "estimated";
+
 export interface AuditRecommendation {
   id: string;
   provider: AuditProvider;
@@ -20,6 +29,8 @@ export interface AuditRecommendation {
 
 export interface WorkspaceMetrics {
   provider: AuditProvider;
+  /** Subscription plan label from the form (Plus, Team, Pro, …) */
+  plan?: string;
   totalSeats: number;
   activeSeats30d: number;
   inactiveSeats30d: number;
@@ -33,6 +44,11 @@ export interface WorkspaceMetrics {
   duplicateTools: AuditProvider[];
   utilizationRate: number; // activeSeats30d / totalSeats
   annualCommitment: boolean;
+  /** Org engineering/team headcount (shared context) */
+  teamSize?: number;
+  useCase?: AuditUseCase | string;
+  /** Whether active/inactive seats came from user report or heuristics */
+  activitySource?: ActivitySource;
 }
 
 export interface AuditEngineResult {
@@ -45,4 +61,18 @@ export interface AuditEngineResult {
   providersScanned: AuditProvider[];
   optimizationScore: number; // 0–100, higher = more waste found
   generatedAt: string;
+}
+
+export interface AuditFormToolInput {
+  provider: string;
+  plan: string;
+  monthlySpend: number;
+  seats: number;
+  /** Optional real active seats in last 30d — preferred over estimates */
+  activeSeats?: number;
+}
+
+export interface AuditFormContext {
+  teamSize?: number;
+  useCase?: string;
 }

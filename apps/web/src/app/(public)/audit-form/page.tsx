@@ -29,6 +29,8 @@ type ToolInput = {
   plan: string;
   monthlySpend: string;
   seats: string;
+  /** Optional real active seats (last 30d) — improves accuracy vs estimates */
+  activeSeats: string;
 };
 
 export default function AuditFormPage() {
@@ -37,14 +39,17 @@ export default function AuditFormPage() {
   
   // Form state with localStorage persistence
   const [tools, setTools] = useLocalStorage<ToolInput[]>("audit-tools", [
-    { provider: "", plan: "", monthlySpend: "", seats: "" },
+    { provider: "", plan: "", monthlySpend: "", seats: "", activeSeats: "" },
   ]);
   const [teamSize, setTeamSize] = useLocalStorage("audit-team-size", "");
   const [useCase, setUseCase] = useLocalStorage("audit-use-case", "");
   const [email, setEmail] = useLocalStorage("audit-email", "");
 
   const addTool = () => {
-    setTools([...tools, { provider: "", plan: "", monthlySpend: "", seats: "" }]);
+    setTools([
+      ...tools,
+      { provider: "", plan: "", monthlySpend: "", seats: "", activeSeats: "" },
+    ]);
   };
 
   const removeTool = (index: number) => {
@@ -62,29 +67,27 @@ export default function AuditFormPage() {
     setIsSubmitting(true);
 
     try {
-      // Transform tools data into workspace metrics format
+      // Send form tools + context; API enriches activity & runs the engine
       const workspaces = tools
         .filter((t) => t.provider && t.plan)
-        .map((t) => ({
-          provider: t.provider,
-          plan: t.plan,
-          totalSeats: parseInt(t.seats) || 1,
-          activeSeats30d: Math.floor((parseInt(t.seats) || 1) * 0.7), // Estimate 70% active
-          inactiveSeats30d: Math.ceil((parseInt(t.seats) || 1) * 0.3), // Estimate 30% inactive
-          monthlySpend: parseFloat(t.monthlySpend) || 0,
-          subscriptionSpend: parseFloat(t.monthlySpend) || 0,
-          apiSpend: 0,
-          avgPromptsPerUser: 15,
-          avgSessionsPerUser: 4,
-          powerUsers: Math.floor((parseInt(t.seats) || 1) * 0.3),
-          casualUsers: Math.ceil((parseInt(t.seats) || 1) * 0.7),
-          utilizationRate: 0.7,
-          duplicateTools: [],
-          annualCommitment: false,
-        }));
+        .map((t) => {
+          const activeParsed = parseInt(t.activeSeats, 10);
+          return {
+            provider: t.provider,
+            plan: t.plan,
+            monthlySpend: parseFloat(t.monthlySpend) || 0,
+            seats: parseInt(t.seats, 10) || 1,
+            ...(Number.isFinite(activeParsed) &&
+            (t.activeSeats ?? "").trim() !== ""
+              ? { activeSeats: activeParsed }
+              : {}),
+          };
+        });
+
+      const parsedTeamSize = parseInt(teamSize, 10);
 
       // Track audit start
-      analytics.auditStarted(workspaces[0]?.provider || 'unknown');
+      analytics.auditStarted(workspaces[0]?.provider || "unknown");
 
       // Call audit API
       const response = await fetch("/api/audits", {
@@ -94,6 +97,8 @@ export default function AuditFormPage() {
           title: `AI Audit - ${new Date().toLocaleDateString()}`,
           workspaces,
           email: email || undefined,
+          teamSize: Number.isFinite(parsedTeamSize) ? parsedTeamSize : undefined,
+          useCase: useCase || undefined,
         }),
       });
 
@@ -191,7 +196,7 @@ export default function AuditFormPage() {
               {tools.map((tool, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded-xl border border-gray-200 bg-gray-50"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 p-4 rounded-xl border border-gray-200 bg-gray-50"
                 >
                   {/* Provider */}
                   <div>
@@ -245,16 +250,33 @@ export default function AuditFormPage() {
                   </div>
 
                   {/* Seats */}
-                  <div className="flex items-end gap-2">
+                  <div>
+                    <Label className="text-xs text-gray-600 mb-1.5">Seats</Label>
+                    <Input
+                      type="number"
+                      placeholder="10"
+                      value={tool.seats}
+                      onChange={(e) => updateTool(index, "seats", e.target.value)}
+                      className="h-10"
+                      required
+                    />
+                  </div>
+
+                  {/* Active seats (optional) */}
+                  <div className="flex items-end gap-2 md:col-span-2 lg:col-span-1">
                     <div className="flex-1">
-                      <Label className="text-xs text-gray-600 mb-1.5">Seats</Label>
+                      <Label className="text-xs text-gray-600 mb-1.5">
+                        Active seats (30d, optional)
+                      </Label>
                       <Input
                         type="number"
-                        placeholder="10"
-                        value={tool.seats}
-                        onChange={(e) => updateTool(index, "seats", e.target.value)}
+                        placeholder="Leave blank to estimate"
+                        value={tool.activeSeats ?? ""}
+                        onChange={(e) =>
+                          updateTool(index, "activeSeats", e.target.value)
+                        }
                         className="h-10"
-                        required
+                        min={0}
                       />
                     </div>
                     {tools.length > 1 && (

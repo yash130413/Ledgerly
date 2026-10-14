@@ -29,6 +29,14 @@ export class CreateAuditDto {
   @IsOptional()
   @IsEmail()
   email?: string;
+
+  @IsOptional()
+  @IsNumber()
+  teamSize?: number;
+
+  @IsOptional()
+  @IsString()
+  useCase?: string;
 }
 
 export class PublicAuditDto {

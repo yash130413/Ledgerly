@@ -160,9 +160,11 @@ describe("plan downgrade logic", () => {
     const casualUsers = 6;
     const metrics = makeMetrics({
       provider: "Cursor",
-      avgPromptsPerUser: 5,    // < 10
-      avgSessionsPerUser: 3,   // < 5
+      avgPromptsPerUser: 5, // < 10
+      avgSessionsPerUser: 3, // < 5
       casualUsers,
+      monthlySpend: 200, // $20/seat × 10
+      plan: "Pro",
     });
     const result = runAuditEngine([metrics]);
 
@@ -286,5 +288,55 @@ describe("recommendation validation", () => {
     expect(result.providersScanned).toContain("Copilot");
     expect(result.providersScanned).not.toContain("ChatGPT");
     expect(result.providersScanned).not.toContain("Claude");
+  });
+});
+
+// ── 6. Stronger context-aware rules ───────────────────────────────────────────
+describe("context-aware rules", () => {
+  it("recommends consolidating ChatGPT + Claude when both are present", () => {
+    const chatgpt = makeMetrics({
+      provider: "ChatGPT",
+      monthlySpend: 400,
+      inactiveSeats30d: 0,
+      utilizationRate: 0.9,
+      avgPromptsPerUser: 40,
+      avgSessionsPerUser: 12,
+      duplicateTools: ["Claude"],
+    });
+    const claude = makeMetrics({
+      provider: "Claude",
+      monthlySpend: 300,
+      inactiveSeats30d: 0,
+      utilizationRate: 0.9,
+      avgPromptsPerUser: 40,
+      avgSessionsPerUser: 12,
+      duplicateTools: ["ChatGPT"],
+    });
+    const result = runAuditEngine([chatgpt, claude]);
+    const found = result.recommendations.find(
+      (r) => r.ruleId === "CLAUDE_VENDOR_CONSOLIDATION_002"
+    );
+    expect(found).toBeDefined();
+  });
+
+  it("flags seats exceeding team size", () => {
+    const metrics = makeMetrics({
+      totalSeats: 20,
+      activeSeats30d: 18,
+      inactiveSeats30d: 2,
+      utilizationRate: 0.9,
+      avgPromptsPerUser: 40,
+      avgSessionsPerUser: 12,
+      teamSize: 10,
+      plan: "Team",
+      monthlySpend: 600,
+    });
+    const result = runAuditEngine([metrics]);
+    const found = result.recommendations.find((r) =>
+      r.ruleId.startsWith("UNIVERSAL_SEATS_EXCEED_TEAM_003")
+    );
+    expect(found).toBeDefined();
+    // excess 10 seats × $30/seat (600/20)
+    expect(found!.monthlySavings).toBe(10 * 30);
   });
 });

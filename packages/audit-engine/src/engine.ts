@@ -2,29 +2,23 @@ import type {
   AuditRecommendation,
   AuditEngineResult,
   AuditPriority,
+  AuditProvider,
   WorkspaceMetrics,
 } from "./types";
-
-// ── Pricing constants ────────────────────────────────────────────────────────
-const PRICING = {
-  CHATGPT_TEAM: 30,
-  CHATGPT_PLUS: 20,
-  CLAUDE_PRO: 20,
-  CURSOR_PRO: 20,
-  COPILOT_BUSINESS: 19,
-  GEMINI_BUSINESS: 20,
-} as const;
+import { pricePerSeat } from "./enrich";
 
 // ── Deterministic confidence formula ────────────────────────────────────────
 function calculateConfidence(
   utilizationRate: number,
   sampleSize: number,
-  spendingConsistency: number
+  spendingConsistency: number,
+  activityReported = false
 ): number {
   let score = 50;
   if (utilizationRate < 0.4) score += 20;
   if (sampleSize > 20) score += 10;
   if (spendingConsistency > 0.8) score += 15;
+  if (activityReported) score += 8;
   return Math.min(score, 95);
 }
 
@@ -42,6 +36,19 @@ function nextId() {
   return `rec_${String(++_seq).padStart(4, "0")}`;
 }
 
+function seatPrice(m: WorkspaceMetrics): number {
+  if (m.totalSeats > 0 && m.monthlySpend > 0) {
+    return Math.round(m.monthlySpend / m.totalSeats);
+  }
+  return pricePerSeat(m.provider, m.plan);
+}
+
+function activityNote(m: WorkspaceMetrics): string {
+  return m.activitySource === "reported"
+    ? "based on reported active seats"
+    : "based on estimated activity from team size, plan, and use case";
+}
+
 // ── Helper: build a recommendation ──────────────────────────────────────────
 function rec(
   partial: Omit<AuditRecommendation, "id" | "priority" | "annualSavings"> & {
@@ -57,21 +64,46 @@ function rec(
   };
 }
 
+const USE_CASE_FIT: Record<string, Partial<Record<AuditProvider, number>>> = {
+  Coding: { Cursor: 0.9, Copilot: 0.88, ChatGPT: 0.55, Claude: 0.6, Gemini: 0.5 },
+  Writing: { ChatGPT: 0.88, Claude: 0.9, Gemini: 0.7, Cursor: 0.35, Copilot: 0.3 },
+  "Data Analysis": {
+    ChatGPT: 0.75,
+    Claude: 0.8,
+    Gemini: 0.78,
+    Cursor: 0.45,
+    Copilot: 0.4,
+  },
+  Research: { Claude: 0.85, ChatGPT: 0.8, Gemini: 0.82, Cursor: 0.4, Copilot: 0.35 },
+  Mixed: { ChatGPT: 0.7, Claude: 0.7, Gemini: 0.65, Cursor: 0.65, Copilot: 0.65 },
+};
+
+function fitFor(m: WorkspaceMetrics): number {
+  const key = m.useCase || "Mixed";
+  return USE_CASE_FIT[key]?.[m.provider] ?? 0.65;
+}
+
 // ── ChatGPT rules ────────────────────────────────────────────────────────────
 function runChatGPTRules(m: WorkspaceMetrics): AuditRecommendation[] {
   const results: AuditRecommendation[] = [];
+  const pps = seatPrice(m);
 
   // Rule 1 — Inactive team seats
   if (m.inactiveSeats30d >= 3) {
-    const monthlySavings = m.inactiveSeats30d * PRICING.CHATGPT_TEAM;
+    const monthlySavings = m.inactiveSeats30d * pps;
     results.push(
       rec({
         provider: "ChatGPT",
         ruleId: "CHATGPT_INACTIVE_SEATS_001",
-        title: "Inactive ChatGPT Team Seats",
-        recommendation: "Remove or downgrade inactive ChatGPT Team seats",
-        reason: `${m.inactiveSeats30d} licensed users showed no activity in the last 30 days, indicating underutilized subscriptions.`,
-        confidenceScore: 92,
+        title: "Inactive ChatGPT Seats",
+        recommendation: "Remove or downgrade inactive ChatGPT seats",
+        reason: `${m.inactiveSeats30d} licensed users showed no activity in the last 30 days (${activityNote(m)}), indicating underutilized ${m.plan || "Team"} subscriptions.`,
+        confidenceScore: calculateConfidence(
+          m.utilizationRate,
+          m.totalSeats,
+          0.85,
+          m.activitySource === "reported"
+        ),
         monthlySavings,
         affectedUsers: m.inactiveSeats30d,
         currentCost: m.subscriptionSpend,
@@ -80,23 +112,33 @@ function runChatGPTRules(m: WorkspaceMetrics): AuditRecommendation[] {
     );
   }
 
-  // Rule 2 — Team plan not needed
-  if (m.totalSeats <= 5 && m.avgSessionsPerUser < 3) {
-    const monthlySavings = m.totalSeats * (PRICING.CHATGPT_TEAM - PRICING.CHATGPT_PLUS);
-    results.push(
-      rec({
-        provider: "ChatGPT",
-        ruleId: "CHATGPT_TEAM_PLAN_002",
-        title: "Team Plan Overhead for Small Group",
-        recommendation: "Consider switching from ChatGPT Team to individual Plus subscriptions",
-        reason: `Current collaboration usage (avg ${m.avgSessionsPerUser.toFixed(1)} sessions/user) appears low relative to team plan pricing.`,
-        confidenceScore: 84,
-        monthlySavings,
-        affectedUsers: m.totalSeats,
-        currentCost: m.totalSeats * PRICING.CHATGPT_TEAM,
-        optimizedCost: m.totalSeats * PRICING.CHATGPT_PLUS,
-      })
-    );
+  // Rule 2 — Team plan not needed (plan-aware)
+  const plan = (m.plan || "").toLowerCase();
+  if (
+    (plan === "team" || plan === "enterprise" || !m.plan) &&
+    m.totalSeats <= 5 &&
+    m.avgSessionsPerUser < 3
+  ) {
+    const teamPrice = pricePerSeat("ChatGPT", m.plan || "Team");
+    const plusPrice = pricePerSeat("ChatGPT", "Plus");
+    const monthlySavings = m.totalSeats * Math.max(0, teamPrice - plusPrice);
+    if (monthlySavings > 0) {
+      results.push(
+        rec({
+          provider: "ChatGPT",
+          ruleId: "CHATGPT_TEAM_PLAN_002",
+          title: "Team Plan Overhead for Small Group",
+          recommendation:
+            "Consider switching from ChatGPT Team to individual Plus subscriptions",
+          reason: `Current collaboration usage (avg ${m.avgSessionsPerUser.toFixed(1)} sessions/user) appears low relative to ${m.plan || "Team"} plan pricing.`,
+          confidenceScore: 84,
+          monthlySavings,
+          affectedUsers: m.totalSeats,
+          currentCost: m.totalSeats * teamPrice,
+          optimizedCost: m.totalSeats * plusPrice,
+        })
+      );
+    }
   }
 
   // Rule 3 — API + subscription duplication
@@ -126,33 +168,30 @@ function runClaudeRules(
   allMetrics: WorkspaceMetrics[]
 ): AuditRecommendation[] {
   const results: AuditRecommendation[] = [];
+  const pps = seatPrice(m);
 
   // Rule 1 — Premium usage without heavy activity
   if (m.avgPromptsPerUser < 20 && m.utilizationRate < 0.5) {
-    const monthlySavings = m.inactiveSeats30d * PRICING.CLAUDE_PRO;
+    const monthlySavings = m.inactiveSeats30d * pps;
     results.push(
       rec({
         provider: "Claude",
         ruleId: "CLAUDE_LOW_ACTIVITY_001",
-        title: "Claude Pro Seats Without Heavy Usage",
-        recommendation: "Reduce unused Claude Pro seats",
-        reason: `Current Claude usage (avg ${m.avgPromptsPerUser} prompts/user) and ${Math.round(m.utilizationRate * 100)}% seat utilization do not justify the number of active premium licenses.`,
+        title: "Claude Seats Without Heavy Usage",
+        recommendation: "Reduce unused Claude premium seats",
+        reason: `Current Claude usage (avg ${m.avgPromptsPerUser} prompts/user) and ${Math.round(m.utilizationRate * 100)}% seat utilization do not justify the number of ${m.plan || "Pro"} licenses (${activityNote(m)}).`,
         confidenceScore: 90,
         monthlySavings,
         affectedUsers: m.inactiveSeats30d,
-        currentCost: m.totalSeats * PRICING.CLAUDE_PRO,
-        optimizedCost: m.activeSeats30d * PRICING.CLAUDE_PRO,
+        currentCost: m.totalSeats * pps,
+        optimizedCost: m.activeSeats30d * pps,
       })
     );
   }
 
-  // Rule 2 — Mixed vendor consolidation
+  // Rule 2 — Mixed vendor consolidation (fixed: check ChatGPT in duplicates only)
   const chatgptMetrics = allMetrics.find((x) => x.provider === "ChatGPT");
-  if (
-    m.duplicateTools.includes("ChatGPT") &&
-    m.duplicateTools.includes("Claude") &&
-    chatgptMetrics
-  ) {
+  if (m.duplicateTools.includes("ChatGPT") && chatgptMetrics) {
     const chatgptSpend = chatgptMetrics.monthlySpend;
     const claudeSpend = m.monthlySpend;
     const monthlySavings = Math.round(Math.min(chatgptSpend, claudeSpend) * 0.25);
@@ -180,33 +219,30 @@ function runCursorRules(
   allMetrics: WorkspaceMetrics[]
 ): AuditRecommendation[] {
   const results: AuditRecommendation[] = [];
+  const pps = seatPrice(m);
 
   // Rule 1 — Casual users on Cursor Pro
   if (m.avgPromptsPerUser < 10 && m.avgSessionsPerUser < 5) {
-    const monthlySavings = m.casualUsers * PRICING.CURSOR_PRO;
+    const monthlySavings = m.casualUsers * pps;
     results.push(
       rec({
         provider: "Cursor",
         ruleId: "CURSOR_LOW_UTILIZATION_001",
-        title: "Low Utilization of Cursor Pro Seats",
-        recommendation: "Downgrade low-usage Cursor Pro users",
-        reason: `${m.casualUsers} licensed users showed fewer than 5 active coding sessions during the last 30 days, reducing ROI on premium coding assistant licenses.`,
+        title: "Low Utilization of Cursor Seats",
+        recommendation: "Downgrade low-usage Cursor users",
+        reason: `${m.casualUsers} licensed users showed fewer than 5 active coding sessions during the last 30 days (${activityNote(m)}), reducing ROI on ${m.plan || "Pro"} coding assistant licenses.`,
         confidenceScore: 88,
         monthlySavings,
         affectedUsers: m.casualUsers,
-        currentCost: m.totalSeats * PRICING.CURSOR_PRO,
-        optimizedCost: (m.totalSeats - m.casualUsers) * PRICING.CURSOR_PRO,
+        currentCost: m.totalSeats * pps,
+        optimizedCost: (m.totalSeats - m.casualUsers) * pps,
       })
     );
   }
 
-  // Rule 2 — Copilot + Cursor redundancy
+  // Rule 2 — Copilot + Cursor redundancy (fixed duplicate check)
   const copilotMetrics = allMetrics.find((x) => x.provider === "Copilot");
-  if (
-    m.duplicateTools.includes("Cursor") &&
-    m.duplicateTools.includes("Copilot") &&
-    copilotMetrics
-  ) {
+  if (m.duplicateTools.includes("Copilot") && copilotMetrics) {
     const cursorSpend = m.monthlySpend;
     const copilotSpend = copilotMetrics.monthlySpend;
     const monthlySavings = Math.round(Math.min(cursorSpend, copilotSpend) * 0.3);
@@ -215,7 +251,8 @@ function runCursorRules(
         provider: "Cursor",
         ruleId: "CURSOR_COPILOT_REDUNDANCY_002",
         title: "Cursor and Copilot Redundancy",
-        recommendation: "Standardize on either Cursor or GitHub Copilot for engineering teams",
+        recommendation:
+          "Standardize on either Cursor or GitHub Copilot for engineering teams",
         reason: `Maintaining both Cursor ($${cursorSpend.toLocaleString()}/mo) and Copilot ($${copilotSpend.toLocaleString()}/mo) creates overlapping functionality and fragmented developer workflows.`,
         confidenceScore: 81,
         monthlySavings,
@@ -231,22 +268,23 @@ function runCursorRules(
 // ── Copilot rules ─────────────────────────────────────────────────────────────
 function runCopilotRules(m: WorkspaceMetrics): AuditRecommendation[] {
   const results: AuditRecommendation[] = [];
+  const pps = seatPrice(m);
 
   // Rule 1 — Unused Copilot seats
   if (m.inactiveSeats30d > 5) {
-    const monthlySavings = m.inactiveSeats30d * PRICING.COPILOT_BUSINESS;
+    const monthlySavings = m.inactiveSeats30d * pps;
     results.push(
       rec({
         provider: "Copilot",
         ruleId: "COPILOT_INACTIVE_SEATS_001",
         title: "Inactive GitHub Copilot Licenses",
         recommendation: "Remove inactive GitHub Copilot licenses",
-        reason: `${m.inactiveSeats30d} Copilot licenses have shown no coding activity within the last 30 days.`,
+        reason: `${m.inactiveSeats30d} Copilot licenses have shown no coding activity within the last 30 days (${activityNote(m)}).`,
         confidenceScore: 94,
         monthlySavings,
         affectedUsers: m.inactiveSeats30d,
-        currentCost: m.totalSeats * PRICING.COPILOT_BUSINESS,
-        optimizedCost: m.activeSeats30d * PRICING.COPILOT_BUSINESS,
+        currentCost: m.totalSeats * pps,
+        optimizedCost: m.activeSeats30d * pps,
       })
     );
   }
@@ -254,19 +292,20 @@ function runCopilotRules(m: WorkspaceMetrics): AuditRecommendation[] {
   // Rule 2 — Junior dev overspend
   if (m.avgPromptsPerUser < 5 && m.powerUsers < m.totalSeats * 0.2) {
     const lowValueSeats = m.totalSeats - m.powerUsers;
-    const monthlySavings = Math.round(lowValueSeats * PRICING.COPILOT_BUSINESS * 0.5);
+    const monthlySavings = Math.round(lowValueSeats * pps * 0.5);
     results.push(
       rec({
         provider: "Copilot",
         ruleId: "COPILOT_POWER_USER_CONCENTRATION_002",
         title: "Copilot Licenses Concentrated in Low-Frequency Users",
-        recommendation: "Restrict Copilot licenses to high-frequency engineering contributors",
+        recommendation:
+          "Restrict Copilot licenses to high-frequency engineering contributors",
         reason: `Only ${m.powerUsers} of ${m.totalSeats} licensed users qualify as power users (avg ${m.avgPromptsPerUser} prompts/user), suggesting a premium tier mismatch for the majority of the team.`,
         confidenceScore: 83,
         monthlySavings,
         affectedUsers: lowValueSeats,
-        currentCost: m.totalSeats * PRICING.COPILOT_BUSINESS,
-        optimizedCost: m.totalSeats * PRICING.COPILOT_BUSINESS - monthlySavings,
+        currentCost: m.totalSeats * pps,
+        optimizedCost: m.totalSeats * pps - monthlySavings,
       })
     );
   }
@@ -277,28 +316,29 @@ function runCopilotRules(m: WorkspaceMetrics): AuditRecommendation[] {
 // ── Gemini rules ─────────────────────────────────────────────────────────────
 function runGeminiRules(m: WorkspaceMetrics): AuditRecommendation[] {
   const results: AuditRecommendation[] = [];
+  const pps = seatPrice(m);
 
   // Rule 1 — Workspace add-on underutilization
   if (m.utilizationRate < 0.4 && m.totalSeats > 10) {
-    const monthlySavings = m.inactiveSeats30d * PRICING.GEMINI_BUSINESS;
+    const monthlySavings = m.inactiveSeats30d * pps;
     results.push(
       rec({
         provider: "Gemini",
         ruleId: "GEMINI_WORKSPACE_UNDERUTILIZATION_001",
         title: "Gemini Workspace Add-on Underutilization",
         recommendation: "Reduce Gemini Workspace add-on seat coverage",
-        reason: `${Math.round((1 - m.utilizationRate) * 100)}% of provisioned Gemini seats (${m.inactiveSeats30d} of ${m.totalSeats}) appear inactive or lightly used over the last 30 days.`,
+        reason: `${Math.round((1 - m.utilizationRate) * 100)}% of provisioned Gemini seats (${m.inactiveSeats30d} of ${m.totalSeats}) appear inactive or lightly used over the last 30 days (${activityNote(m)}).`,
         confidenceScore: 89,
         monthlySavings,
         affectedUsers: m.inactiveSeats30d,
-        currentCost: m.totalSeats * PRICING.GEMINI_BUSINESS,
-        optimizedCost: m.activeSeats30d * PRICING.GEMINI_BUSINESS,
+        currentCost: m.totalSeats * pps,
+        optimizedCost: m.activeSeats30d * pps,
       })
     );
   }
 
   // Rule 2 — Workspace feature overlap
-  if (m.duplicateTools.length >= 3) {
+  if (m.duplicateTools.length >= 2) {
     const monthlySavings = Math.round(m.monthlySpend * 0.2);
     results.push(
       rec({
@@ -306,7 +346,7 @@ function runGeminiRules(m: WorkspaceMetrics): AuditRecommendation[] {
         ruleId: "GEMINI_PLATFORM_OVERLAP_002",
         title: "AI Productivity Platform Overlap",
         recommendation: "Consolidate overlapping AI productivity platforms",
-        reason: `${m.duplicateTools.length} AI assistants (${m.duplicateTools.join(", ")}) are currently serving similar productivity use cases across the organization, creating redundant licensing costs.`,
+        reason: `${m.duplicateTools.length} other AI assistants (${m.duplicateTools.join(", ")}) are currently serving similar productivity use cases alongside Gemini, creating redundant licensing costs.`,
         confidenceScore: 76,
         monthlySavings,
         currentCost: m.monthlySpend,
@@ -319,23 +359,31 @@ function runGeminiRules(m: WorkspaceMetrics): AuditRecommendation[] {
 }
 
 // ── Universal rules ───────────────────────────────────────────────────────────
-function runUniversalRules(m: WorkspaceMetrics): AuditRecommendation[] {
+function runUniversalRules(
+  m: WorkspaceMetrics,
+  allMetrics: WorkspaceMetrics[]
+): AuditRecommendation[] {
   const results: AuditRecommendation[] = [];
+  const pps = seatPrice(m);
+  const reported = m.activitySource === "reported";
 
   // Rule 1 — Low utilization
-  if (m.utilizationRate < 0.5) {
+  if (m.utilizationRate < 0.5 && m.inactiveSeats30d > 0) {
     const removableSeats = m.inactiveSeats30d;
-    const pricePerSeat =
-      m.totalSeats > 0 ? Math.round(m.monthlySpend / m.totalSeats) : 20;
-    const monthlySavings = removableSeats * pricePerSeat;
-    const confidence = calculateConfidence(m.utilizationRate, m.totalSeats, 0.85);
+    const monthlySavings = removableSeats * pps;
+    const confidence = calculateConfidence(
+      m.utilizationRate,
+      m.totalSeats,
+      0.85,
+      reported
+    );
     results.push(
       rec({
         provider: m.provider,
         ruleId: `UNIVERSAL_LOW_UTILIZATION_001_${m.provider.toUpperCase()}`,
         title: `${m.provider} Seat Utilization Below Benchmark`,
         recommendation: "Reduce inactive AI software licenses",
-        reason: `Overall seat utilization is ${Math.round(m.utilizationRate * 100)}% — below the 50% SaaS efficiency benchmark. ${removableSeats} seats have shown no activity in the last 30 days.`,
+        reason: `Overall seat utilization is ${Math.round(m.utilizationRate * 100)}% — below the 50% SaaS efficiency benchmark. ${removableSeats} seats have shown no activity in the last 30 days (${activityNote(m)}).`,
         confidenceScore: confidence,
         monthlySavings,
         affectedUsers: removableSeats,
@@ -354,11 +402,86 @@ function runUniversalRules(m: WorkspaceMetrics): AuditRecommendation[] {
         ruleId: `UNIVERSAL_ANNUAL_CONTRACT_002_${m.provider.toUpperCase()}`,
         title: `${m.provider} Annual Commitment Misaligned with Usage`,
         recommendation: "Renegotiate annual AI software commitments",
-        reason: `Current utilization (${Math.round(m.utilizationRate * 100)}%) suggests the organization is overcommitted on an annual contract relative to actual demand.`,
+        reason: `Current utilization (${Math.round(m.utilizationRate * 100)}%) suggests the organization is overcommitted on an annual ${m.plan || ""} contract relative to actual demand.`,
         confidenceScore: 79,
         monthlySavings,
         currentCost: m.monthlySpend,
         optimizedCost: m.monthlySpend - monthlySavings,
+      })
+    );
+  }
+
+  // Rule 3 — Seats exceed team size
+  if (
+    typeof m.teamSize === "number" &&
+    m.teamSize > 0 &&
+    m.totalSeats > m.teamSize
+  ) {
+    const excess = m.totalSeats - m.teamSize;
+    const monthlySavings = excess * pps;
+    results.push(
+      rec({
+        provider: m.provider,
+        ruleId: `UNIVERSAL_SEATS_EXCEED_TEAM_003_${m.provider.toUpperCase()}`,
+        title: `${m.provider} Seats Exceed Team Size`,
+        recommendation: "Right-size licenses to match actual headcount",
+        reason: `You licensed ${m.totalSeats} ${m.provider} seats for a team of ${m.teamSize} — ${excess} seats cannot be meaningfully used and are likely wasted spend.`,
+        confidenceScore: 93,
+        monthlySavings,
+        affectedUsers: excess,
+        currentCost: m.monthlySpend,
+        optimizedCost: m.monthlySpend - monthlySavings,
+      })
+    );
+  }
+
+  // Rule 4 — Plan / use-case misfit on premium tiers
+  const fit = fitFor(m);
+  const premium =
+    m.plan &&
+    ["enterprise", "business", "ultra", "team"].includes(m.plan.toLowerCase());
+  if (premium && fit < 0.55 && m.monthlySpend > 0) {
+    const monthlySavings = Math.round(m.monthlySpend * 0.35);
+    results.push(
+      rec({
+        provider: m.provider,
+        ruleId: `UNIVERSAL_PLAN_USECASE_MISFIT_004_${m.provider.toUpperCase()}`,
+        title: `${m.provider} ${m.plan} Misaligned with ${m.useCase || "Primary"} Work`,
+        recommendation: `Reassess ${m.provider} ${m.plan} for a ${m.useCase || "Mixed"}-focused team`,
+        reason: `Primary use case "${m.useCase || "Mixed"}" is a weak fit for ${m.provider} at the ${m.plan} tier. Consider a lighter plan or a tool better matched to this workload.`,
+        confidenceScore: 74,
+        monthlySavings,
+        currentCost: m.monthlySpend,
+        optimizedCost: m.monthlySpend - monthlySavings,
+      })
+    );
+  }
+
+  // Rule 5 — Cross-tool stack bloat (once per highest-spend workspace)
+  const isPrimary =
+    allMetrics.length >= 2 &&
+    m.monthlySpend === Math.max(...allMetrics.map((x) => x.monthlySpend)) &&
+    m.provider ===
+      allMetrics.find(
+        (x) =>
+          x.monthlySpend === Math.max(...allMetrics.map((y) => y.monthlySpend))
+      )?.provider;
+
+  if (isPrimary && allMetrics.length >= 2) {
+    const totalSpend = allMetrics.reduce((s, x) => s + x.monthlySpend, 0);
+    const names = allMetrics.map((x) => x.provider).join(", ");
+    const monthlySavings = Math.round(totalSpend * 0.15);
+    results.push(
+      rec({
+        provider: m.provider,
+        ruleId: "UNIVERSAL_CROSS_TOOL_STACK_005",
+        title: "Multi-Tool AI Stack Consolidation Opportunity",
+        recommendation: "Consolidate overlapping AI tools into a smaller core stack",
+        reason: `Running ${allMetrics.length} AI tools (${names}) at $${totalSpend.toLocaleString()}/mo for ${m.useCase || "mixed"} work often duplicates capability. Standardizing on 1–2 primary tools typically cuts spend 10–20%.`,
+        confidenceScore: 70,
+        monthlySavings,
+        currentCost: totalSpend,
+        optimizedCost: totalSpend - monthlySavings,
       })
     );
   }
@@ -389,7 +512,7 @@ export function runAuditEngine(workspaces: WorkspaceMetrics[]): AuditEngineResul
         all.push(...runGeminiRules(m));
         break;
     }
-    all.push(...runUniversalRules(m));
+    all.push(...runUniversalRules(m, workspaces));
   }
 
   // Deduplicate by ruleId (universal rules can overlap with provider-specific)
@@ -411,8 +534,11 @@ export function runAuditEngine(workspaces: WorkspaceMetrics[]): AuditEngineResul
   const totalCurrentSpend = workspaces.reduce((s, m) => s + m.monthlySpend, 0);
   // Optimization score: inverse of waste ratio, clamped 0–100
   // A score of 100 = no waste found. Lower = more savings opportunity identified.
-  const wasteRatio = totalCurrentSpend > 0 ? totalMonthlySavings / totalCurrentSpend : 0;
-  const optimizationScore = Math.round(Math.max(0, Math.min(100, (1 - wasteRatio) * 100)));
+  const wasteRatio =
+    totalCurrentSpend > 0 ? totalMonthlySavings / totalCurrentSpend : 0;
+  const optimizationScore = Math.round(
+    Math.max(0, Math.min(100, (1 - wasteRatio) * 100))
+  );
 
   return {
     recommendations: deduped,
