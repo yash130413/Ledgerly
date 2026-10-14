@@ -1,4 +1,5 @@
 import { Navbar } from "@/components/landing/navbar";
+import { getSessionUser } from "@/lib/auth/session";
 import { Hero } from "@/components/landing/hero";
 import { LogoBar } from "@/components/landing/logo-bar";
 import { WhyOverspend } from "@/components/landing/why-overspend";
@@ -11,10 +12,12 @@ import { CTA } from "@/components/landing/cta";
 import { FAQ } from "@/components/landing/faq";
 import { Footer } from "@/components/landing/footer";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const user = await getSessionUser();
+
   return (
     <>
-      <Navbar />
+      <Navbar initialUser={user} />
       <main>
         <Hero />
         <LogoBar />

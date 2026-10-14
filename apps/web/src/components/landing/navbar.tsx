@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LedgerlyLogo } from "@/components/brand/ledgerly-logo";
+import type { SessionUser } from "@/lib/auth/constants";
 
 const links = [
   { href: "#features", label: "Features" },
@@ -15,7 +16,8 @@ const links = [
   { href: "#faq", label: "FAQ" },
 ];
 
-export function Navbar() {
+export function Navbar({ initialUser }: { initialUser?: SessionUser | null }) {
+  const [user, setUser] = useState<SessionUser | null>(initialUser ?? null);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -24,6 +26,30 @@ export function Navbar() {
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  useEffect(() => {
+    if (initialUser !== undefined) {
+      setUser(initialUser);
+      return;
+    }
+    // Client-side session check
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.user) setUser(data.user);
+      })
+      .catch(() => {});
+  }, [initialUser]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      setUser(null);
+      window.location.href = "/";
+    } catch (e) {
+      console.error("Logout error", e);
+    }
+  };
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 flex justify-center pt-4 px-4">
@@ -58,16 +84,36 @@ export function Navbar() {
 
         {/* Desktop CTAs */}
         <div className="hidden md:flex items-center gap-2">
-          <Link href="/login">
-            <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900 rounded-xl">
-              Log in
-            </Button>
-          </Link>
-          <Link href="/signup">
-            <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium shadow-sm">
-              Get started free
-            </Button>
-          </Link>
+          {user ? (
+            <>
+              <Link href="/dashboard">
+                <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium shadow-sm flex items-center gap-1.5">
+                  Dashboard
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Button>
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="text-xs text-gray-500 hover:text-gray-900 px-2 py-1 transition-colors"
+              >
+                Log out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900 rounded-xl">
+                  Log in
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium shadow-sm">
+                  Get started free
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -103,12 +149,27 @@ export function Navbar() {
                 </Link>
               ))}
               <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-gray-100">
-                <Link href="/login" onClick={() => setOpen(false)}>
-                  <Button variant="outline" size="sm" className="w-full rounded-xl">Log in</Button>
-                </Link>
-                <Link href="/signup" onClick={() => setOpen(false)}>
-                  <Button size="sm" className="w-full bg-green-600 hover:bg-green-700 text-white rounded-xl">Get started free</Button>
-                </Link>
+                {user ? (
+                  <>
+                    <Link href="/dashboard" onClick={() => setOpen(false)}>
+                      <Button size="sm" className="w-full bg-green-600 hover:bg-green-700 text-white rounded-xl flex items-center justify-center gap-1.5">
+                        Go to Dashboard <ArrowRight className="w-3.5 h-3.5" />
+                      </Button>
+                    </Link>
+                    <Button variant="outline" size="sm" onClick={handleLogout} className="w-full rounded-xl">
+                      Log out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" onClick={() => setOpen(false)}>
+                      <Button variant="outline" size="sm" className="w-full rounded-xl">Log in</Button>
+                    </Link>
+                    <Link href="/signup" onClick={() => setOpen(false)}>
+                      <Button size="sm" className="w-full bg-green-600 hover:bg-green-700 text-white rounded-xl">Get started free</Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>

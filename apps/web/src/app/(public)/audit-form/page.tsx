@@ -1,16 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowRight, Loader2, TrendingDown, Users, Zap } from "lucide-react";
+import { ArrowRight, Loader2, TrendingDown, Users, Zap, Shield, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { analytics } from "@/lib/analytics";
 import { LedgerlyLogo } from "@/components/brand/ledgerly-logo";
+import type { SessionUser } from "@/lib/auth/constants";
 
 // Provider options
 const PROVIDERS = [
@@ -36,6 +37,19 @@ type ToolInput = {
 export default function AuditFormPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
+  const [saveToAccount, setSaveToAccount] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.user) {
+          setCurrentUser(data.user);
+        }
+      })
+      .catch(() => {});
+  }, []);
   
   // Form state with localStorage persistence
   const [tools, setTools] = useLocalStorage<ToolInput[]>("audit-tools", [
@@ -89,8 +103,11 @@ export default function AuditFormPage() {
       // Track audit start
       analytics.auditStarted(workspaces[0]?.provider || "unknown");
 
-      // Call audit API
-      const response = await fetch("/api/audits", {
+      // If user is logged in AND chooses to save, attach to account. Otherwise run as pure guest.
+      const auditEndpoint =
+        currentUser && saveToAccount ? "/api/audits" : "/api/audits?guest=true";
+
+      const response = await fetch(auditEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -138,9 +155,22 @@ export default function AuditFormPage() {
               wordmarkClassName="font-bold text-xl"
             />
           </Link>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Zap className="w-4 h-4 text-green-600" />
-            Free AI Spend Audit
+          <div className="flex items-center gap-3">
+            {currentUser ? (
+              <div className="flex items-center gap-2">
+                <Link href="/dashboard">
+                  <Button variant="outline" size="sm" className="rounded-xl text-xs gap-1.5">
+                    Dashboard
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <Zap className="w-4 h-4 text-green-600" />
+                Free AI Spend Audit
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -186,6 +216,26 @@ export default function AuditFormPage() {
           onSubmit={handleSubmit}
           className="bg-white rounded-2xl border border-gray-200 shadow-lg p-8"
         >
+          {currentUser && (
+            <div className="mb-6 rounded-xl border border-blue-100 bg-blue-50/60 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs text-gray-700">
+                  Signed in as <strong className="text-gray-900 font-semibold">{currentUser.email}</strong>
+                </span>
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-gray-700 select-none">
+                <input
+                  type="checkbox"
+                  checked={saveToAccount}
+                  onChange={(e) => setSaveToAccount(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                />
+                Save report to my account
+              </label>
+            </div>
+          )}
+
           {/* Tools Section */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">

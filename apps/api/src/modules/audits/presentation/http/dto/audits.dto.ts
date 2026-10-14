@@ -40,9 +40,17 @@ export class CreateAuditDto {
 }
 
 export class PublicAuditDto {
+  @IsOptional()
+  @IsString()
+  title?: string;
+
   @IsArray()
   @ArrayMinSize(1)
   workspaces!: unknown[];
+
+  @IsOptional()
+  @IsEmail()
+  email?: string;
 
   @IsOptional()
   @IsNumber()
