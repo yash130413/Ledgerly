@@ -69,7 +69,7 @@ Directly contextualizes spend against real-world startup & enterprise cohorts:
 Ledgerly is structured as a modern, decoupled monorepo:
 
 ```
-credex-app/
+ledgerly/
 ├── apps/
 │   ├── web/                     # Next.js 16 (App Router, React 19, Tailwind CSS v4, Framer Motion)
 │   ├── api/                     # NestJS 11 (Modular DDD, Supabase Service, Auth Guards, BFF endpoints)
