@@ -2,6 +2,9 @@
 
 Production UI for Ledgerly AI spend audit.
 
+* **Live frontend:** https://ledgerly-93.vercel.app/
+* **Backend API (Render):** https://ledgerly-xcf8.onrender.com/
+
 ```
 src/app/           # routes
 src/components/    # UI (landing frozen)

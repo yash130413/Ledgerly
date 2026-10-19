@@ -170,7 +170,7 @@ Work another 16+ hours. Build public audit flow, write all remaining docs, write
 - Completed LANDING_COPY.md with hero copy and FAQs
 - Completed METRICS.md with North Star metric definition
 - Set up GitHub Actions CI workflow
-- Deployed to Vercel production
+- Deployed to Vercel production (frontend: https://ledgerly-93.vercel.app/) and Render (API: https://ledgerly-xcf8.onrender.com/)
 - Tested entire flow end-to-end as a cold visitor
 - Ran Lighthouse audits (Performance: 92, Accessibility: 95, Best Practices: 100)
 - Fixed multiple bugs found during testing

@@ -62,6 +62,9 @@ npm run test:e2e
 
 ## 🌐 Production Deployment (Render)
 
+* **Live API:** https://ledgerly-xcf8.onrender.com/
+* **Health:** https://ledgerly-xcf8.onrender.com/api/health
 * **Build Command:** `npm install && npm run build:api` (from repo root)
 * **Start Command:** `npm run start:api`
 * **Port:** `10000` (Render default)
+* **Frontend (Vercel):** https://ledgerly-93.vercel.app/

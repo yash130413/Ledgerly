@@ -13,7 +13,7 @@ Identify wasted AI software spend, underutilized subscriptions, duplicate toolin
 [![Tests](https://img.shields.io/badge/Vitest-40%2F40%20Passing-green?style=flat-square&logo=vitest)](https://vitest.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](./LICENSE)
 
-[GitHub Repository](https://github.com/yash130413/Ledgerly) · [Live Frontend (Vercel)](https://ledgerly.vercel.app) · [Backend API (Render)](https://ledgerly-api.onrender.com)
+[GitHub Repository](https://github.com/yash130413/Ledgerly) · [Live Frontend (Vercel)](https://ledgerly-93.vercel.app/) · [Backend API (Render)](https://ledgerly-xcf8.onrender.com/)
 
 </div>
 
@@ -107,7 +107,7 @@ graph TD
 | **Authentication** | JWT Auth with HTTP-only secure cookie sessions |
 | **Emails** | [Resend](https://resend.com/) + React Email |
 | **Testing** | [Vitest](https://vitest.dev/) (40 Unit Tests covering all rules & benchmarking) |
-| **Deployment** | Vercel (Frontend) & Render (Backend API) |
+| **Deployment** | [Vercel](https://ledgerly-93.vercel.app/) (Frontend) & [Render](https://ledgerly-xcf8.onrender.com/) (Backend API) |
 
 ---
 
@@ -172,8 +172,21 @@ Distributed under the MIT License. See [LICENSE](./LICENSE) for details.
 
 ---
 
+## 🌐 Live Deployment
+
+| Service | Platform | URL |
+|---|---|---|
+| **Frontend** | Vercel | https://ledgerly-93.vercel.app/ |
+| **Backend API** | Render | https://ledgerly-xcf8.onrender.com/ |
+| **Source** | GitHub | https://github.com/yash130413/Ledgerly |
+
+Health check: `https://ledgerly-xcf8.onrender.com/api/health`
+
+---
+
 ## 👨‍💻 Author
 
 **Yash Rohilla**  
 * GitHub: [@yash130413](https://github.com/yash130413)  
-* Project Repo: [https://github.com/yash130413/Ledgerly](https://github.com/yash130413/Ledgerly)
+* Project Repo: [https://github.com/yash130413/Ledgerly](https://github.com/yash130413/Ledgerly)  
+* Live App: [https://ledgerly-93.vercel.app/](https://ledgerly-93.vercel.app/)

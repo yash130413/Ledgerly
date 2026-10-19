@@ -11,7 +11,7 @@ The architecture is built around five principles:
 - **Public-first** — the main audit flow requires zero authentication; email captured AFTER value shown
 - **Explainability** — every recommendation traces back to a named rule and a concrete savings formula
 - **Security** — all sensitive keys and audit logic run server-side only
-- **Low operational complexity** — managed infrastructure (Vercel + Supabase + Resend) over self-hosted services
+- **Low operational complexity** — managed infrastructure (Vercel frontend + Render API + Supabase + Resend) over self-hosted services
 - **Horizontal scalability** — stateless API layer, lightweight rule evaluation, queue-ready design
 
 ---
@@ -270,24 +270,35 @@ Next.js enforces this boundary — any variable without the `NEXT_PUBLIC_` prefi
 
 ## Deployment Architecture
 
+**Production URLs**
+
+| Service | Platform | URL |
+|---|---|---|
+| Frontend (`apps/web`) | Vercel | https://ledgerly-93.vercel.app/ |
+| Backend API (`apps/api`) | Render | https://ledgerly-xcf8.onrender.com/ |
+| Source | GitHub | https://github.com/yash130413/Ledgerly |
+
 ```
 Developer Machine
       │  git push
       ▼
 GitHub Repository
-      │  webhook
-      ▼
-Vercel Build Pipeline
-  ├── npm install
-  ├── next build (type-check + bundle)
-  └── deploy to Edge Network
       │
-      ├── Supabase Cloud (PostgreSQL, Auth, RLS)
-      ├── Resend (transactional email delivery)
-      └── Anthropic API (narrative generation)
+      ├── webhook → Vercel (Next.js web)
+      │     ├── npm install
+      │     ├── npm run build:web
+      │     └── deploy → https://ledgerly-93.vercel.app/
+      │
+      └── webhook → Render (NestJS API)
+            ├── npm install && npm run build:api
+            └── start → https://ledgerly-xcf8.onrender.com/
+                  │
+                  ├── Supabase Cloud (PostgreSQL + RLS)
+                  ├── Resend (transactional email delivery)
+                  └── Anthropic API (narrative generation)
 ```
 
-Zero-downtime deployments. Preview deployments on every PR branch.
+Zero-downtime frontend deploys on Vercel (preview deployments on every PR). API deploys independently on Render.
 
 ---
 

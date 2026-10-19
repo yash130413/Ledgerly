@@ -2,6 +2,11 @@
 
 Ledgerly = AI spend audit & optimization platform.
 
+**Live**
+
+- Frontend (Vercel): https://ledgerly-93.vercel.app/
+- Backend API (Render): https://ledgerly-xcf8.onrender.com/
+
 ## Target system
 
 ```
