@@ -246,9 +246,9 @@ function MockDashboard() {
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: "Monthly Savings", value: "$1,840",  color: "text-green-600" },
-              { label: "Annual Savings",  value: "$22,080", color: "text-gray-900" },
-              { label: "Findings",        value: "7",       color: "text-orange-500" },
+              { label: "Monthly Savings", value: "$2,167",  color: "text-green-600" },
+              { label: "Annual Savings",  value: "$26,004", color: "text-gray-900" },
+              { label: "Findings",        value: "9",       color: "text-orange-500" },
             ].map((s) => (
               <div key={s.label} className="rounded-xl bg-gray-50 border border-gray-100 p-3 flex flex-col gap-1">
                 <span className="text-[10px] text-gray-400">{s.label}</span>
@@ -280,8 +280,9 @@ function MockDashboard() {
           <div className="flex flex-col gap-2">
             <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Top findings</p>
             {[
+              { provider: "OpenAI",  title: "Route GPT-4o tasks to gpt-4o-mini",       savings: "$3,924", priority: "Critical", color: "text-red-500 bg-red-50 border-red-200" },
               { provider: "Cursor",  title: "8 inactive Pro seats detected",           savings: "$1,920", priority: "High",     color: "text-orange-500 bg-orange-50 border-orange-200" },
-              { provider: "ChatGPT", title: "Duplicate usage across Claude + ChatGPT", savings: "$4,200", priority: "Critical", color: "text-red-500 bg-red-50 border-red-200" },
+              { provider: "Peer",    title: "1.8× above industry median spend/dev",   savings: "$7,680", priority: "High",     color: "text-orange-500 bg-orange-50 border-orange-200" },
             ].map((r) => (
               <div key={r.title} className="rounded-xl border border-gray-100 bg-white p-3 flex items-start gap-3 shadow-sm">
                 <div className="flex-1 min-w-0 flex flex-col gap-1.5">
@@ -337,7 +338,7 @@ export function Hero() {
           <motion.div {...fadeUp(0)}>
             <span className="inline-flex items-center gap-2 text-xs font-medium text-green-700 border border-green-200 bg-green-50 px-3 py-1.5 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500" aria-hidden="true" />
-              AI spend visibility for engineering teams
+              AI FinOps platform for engineering teams
             </span>
           </motion.div>
 
@@ -356,17 +357,17 @@ export function Hero() {
             {...fadeUp(0.16)}
             className="text-lg text-gray-500 leading-relaxed max-w-md"
           >
-            Ledgerly audits seat utilization, detects duplicate vendors, and surfaces
-            finance-ready optimization recommendations across all major AI providers.
+            Ledgerly audits seat utilization, detects duplicate vendors, benchmarks you against industry peers,
+            and surfaces finance-ready recommendations — with smart model routing insights that cut API costs by up to 48%.
           </motion.p>
 
           {/* Trust signals */}
           <motion.div {...fadeUp(0.22)} className="flex flex-wrap gap-x-5 gap-y-2">
             {[
-              { icon: ShieldCheck, label: "Deterministic audits" },
-              { icon: TrendingDown, label: "Explainable savings" },
-              { icon: Users,        label: "Seat-level visibility" },
-              { icon: GitMerge,     label: "Vendor overlap detection" },
+              { icon: ShieldCheck, label: "15+ deterministic rules" },
+              { icon: TrendingDown, label: "Smart model routing" },
+              { icon: Users,        label: "4-tier seat segmentation" },
+              { icon: GitMerge,     label: "Industry peer benchmarks" },
             ].map(({ icon: Icon, label }) => (
               <span key={label} className="flex items-center gap-1.5 text-sm text-gray-500">
                 <Icon className="w-3.5 h-3.5 text-green-600 shrink-0" aria-hidden="true" />

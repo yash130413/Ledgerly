@@ -16,6 +16,18 @@ const faqs = [
     a: "No. Ledgerly is entirely out-of-band. We pull usage data directly from provider billing APIs and logs — we never sit in the request path, so there's zero latency impact.",
   },
   {
+    q: "How does smart model routing work?",
+    a: "Ledgerly analyzes your API spend patterns and detects when your team is routing simple tasks (summarization, classification, extraction) to expensive flagship models like GPT-4o or Claude 3.5 Sonnet. We estimate the savings from switching those workloads to mini/haiku/flash-class models and flag it as a recommendation with a projected savings figure.",
+  },
+  {
+    q: "What is industry peer benchmarking?",
+    a: "We compare your spend-per-developer against real startup cohorts segmented by team size: 1–10, 11–50, 51–200, and 200+ developers. You'll see whether you're below, at, or above the median, so you know if your AI budget is proportionate before your CFO asks.",
+  },
+  {
+    q: "What do the 4 user tiers mean?",
+    a: "Ledgerly classifies every seat as Power User (daily active, high session count), Regular User (weekly active), Casual User (sporadic usage), or Inactive (no activity in 30 days). This segmentation drives right-sizing recommendations and prevents blanket downgrades that hurt your most productive contributors.",
+  },
+  {
     q: "How much does Ledgerly cost?",
     a: "Ledgerly is free for teams spending up to $5k/month on AI APIs. Above that, we charge 1% of the spend we audit — and we guarantee to find at least 3x that in savings, or your money back.",
   },
@@ -30,10 +42,6 @@ const faqs = [
   {
     q: "Is my data secure?",
     a: "Yes. All data is encrypted at rest (AES-256) and in transit (TLS 1.3). We are SOC 2 Type II certified and GDPR compliant. We never share your data with third parties.",
-  },
-  {
-    q: "Can I use Ledgerly for multiple teams or projects?",
-    a: "Absolutely. You can create workspaces per team, tag API calls by project or feature, and set separate budgets and alerts for each. It's built for multi-team engineering orgs.",
   },
 ];
 

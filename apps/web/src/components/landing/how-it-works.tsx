@@ -1,5 +1,5 @@
 import { FadeIn, StaggerChildren, StaggerItem } from "@/components/shared/motion";
-import { Plug, ScanLine, FileBarChart } from "lucide-react";
+import { Plug, ScanLine, FileBarChart, BarChart2 } from "lucide-react";
 
 const steps = [
   {
@@ -14,14 +14,21 @@ const steps = [
     icon: ScanLine,
     title: "Analyze spend and utilization",
     description:
-      "Our deterministic audit engine runs 13 rule-based checks across seat utilization, vendor overlap, inactive licenses, and API vs subscription mismatches.",
+      "Our deterministic audit engine runs 15+ rule-based checks — covering seat utilization, vendor overlap, inactive licenses, API vs subscription mismatches, and model routing inefficiencies.",
   },
   {
     n: "03",
-    icon: FileBarChart,
-    title: "Receive optimization recommendations",
+    icon: BarChart2,
+    title: "Benchmark against industry peers",
     description:
-      "Get a prioritized list of savings opportunities — each with a confidence score, affected user count, and estimated annual savings. Share directly with your CFO.",
+      "Compare your spend-per-developer against real startup cohorts. Know instantly whether your AI budget is lean or bloated versus similarly-sized engineering teams.",
+  },
+  {
+    n: "04",
+    icon: FileBarChart,
+    title: "Act on prioritized recommendations",
+    description:
+      "Get an effort vs impact matrix of savings opportunities — each with a confidence score, affected user count, and estimated annual savings. Share directly with your CFO.",
   },
 ];
 
@@ -38,7 +45,7 @@ export function HowItWorks() {
           </h2>
         </FadeIn>
 
-        <StaggerChildren className="grid sm:grid-cols-3 gap-8 relative">
+        <StaggerChildren className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 relative">
           {/* Connector line */}
           <div
             className="hidden sm:block absolute top-5 left-[16.5%] right-[16.5%] h-px pointer-events-none"

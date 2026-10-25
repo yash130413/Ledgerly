@@ -1,4 +1,4 @@
-import { BarChart3, Users, Zap, GitMerge, Bell, FileText } from "lucide-react";
+import { BarChart3, Users, Zap, GitMerge, Bell, FileText, GitBranch, BarChart2 } from "lucide-react";
 import { FadeIn, StaggerChildren, StaggerItem } from "@/components/shared/motion";
 
 const features = [
@@ -11,16 +11,30 @@ const features = [
   },
   {
     icon: Users,
-    title: "Seat utilization analysis",
+    title: "4-tier seat segmentation",
     description:
-      "Identify inactive seats, casual users, and over-provisioned licenses. See exactly which team members haven't used a tool in 30 days.",
+      "Every seat is classified as Power User, Regular User, Casual User, or Inactive — giving you a precise utilization picture and right-sizing targets per person.",
     soon: false,
   },
   {
     icon: Zap,
     title: "Deterministic audit engine",
     description:
-      "13 rule-based checks across 5 providers produce explainable, finance-friendly recommendations — no LLM hallucinations, no black-box outputs.",
+      "15+ rule-based checks across 5 providers produce explainable, finance-friendly recommendations — no LLM hallucinations, no black-box outputs.",
+    soon: false,
+  },
+  {
+    icon: GitBranch,
+    title: "Smart model routing",
+    description:
+      "Detects when teams route simple tasks to flagship models (GPT-4o, Claude 3.5 Sonnet) that could be handled by mini/haiku/flash variants — unlocking up to 48% API savings.",
+    soon: false,
+  },
+  {
+    icon: BarChart2,
+    title: "Industry peer benchmarking",
+    description:
+      "Compare your AI spend per developer against real startup cohorts (1–10, 11–50, 51–200, 200+ devs). Know if you're above or below the median before your CFO asks.",
     soon: false,
   },
   {
@@ -32,10 +46,10 @@ const features = [
   },
   {
     icon: Bell,
-    title: "Recurring spend monitoring",
+    title: "Effort vs impact prioritization",
     description:
-      "Schedule monthly re-audits to catch new waste as your team grows, adds seats, or onboards new AI tools.",
-    soon: true,
+      "Every recommendation is plotted on an effort/impact matrix so your team can instantly see which optimizations to act on first for maximum ROI.",
+    soon: false,
   },
   {
     icon: FileText,

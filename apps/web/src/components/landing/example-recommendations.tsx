@@ -2,9 +2,22 @@
 
 import { motion } from "framer-motion";
 import { FadeIn } from "@/components/shared/motion";
-import { Users, GitMerge, TrendingDown, ShieldCheck } from "lucide-react";
+import { Users, GitMerge, TrendingDown, ShieldCheck, GitBranch, BarChart2 } from "lucide-react";
 
 const recs = [
+  {
+    provider: "OpenAI",
+    providerColor: "#34d399",
+    icon: GitBranch,
+    priority: "Critical" as const,
+    title: "Route simple tasks from GPT-4o to GPT-4o mini",
+    description:
+      "Your team is spending $680/mo on GPT-4o for summarization and classification tasks. GPT-4o mini handles these at 90% quality parity — switching yields ~$327/mo in savings.",
+    monthlySavings: 327,
+    annualSavings: 3924,
+    confidence: 91,
+    affectedUsers: 23,
+  },
   {
     provider: "Cursor",
     providerColor: "#818cf8",
@@ -43,6 +56,19 @@ const recs = [
     annualSavings: 2736,
     confidence: 94,
     affectedUsers: 12,
+  },
+  {
+    provider: "Benchmark",
+    providerColor: "#f59e0b",
+    icon: BarChart2,
+    priority: "Medium" as const,
+    title: "Spend is 1.8× above the peer median for 11–50-dev teams",
+    description:
+      "Your org spends $142/dev/month on AI tooling. The median for similarly-sized startups is $78/dev/month. Industry peer benchmarking pinpoints where consolidation matters most.",
+    monthlySavings: 640,
+    annualSavings: 7680,
+    confidence: 85,
+    affectedUsers: 40,
   },
 ];
 
@@ -136,11 +162,12 @@ export function ExampleRecommendations() {
           </h2>
           <p className="mt-4 text-gray-500 text-lg max-w-lg leading-relaxed">
             Every recommendation includes a confidence score, affected user count, and
-            the exact reasoning — so your finance team can act on it without a follow-up call.
+            the exact reasoning — covering seat waste, vendor overlap, model routing, and
+            industry peer benchmarks.
           </p>
         </FadeIn>
 
-        <div className="grid sm:grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {recs.map((rec, i) => (
             <RecCard key={rec.title} rec={rec} index={i} />
           ))}

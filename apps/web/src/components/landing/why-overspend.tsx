@@ -20,10 +20,16 @@ const reasons = [
       "AI software spend is fragmented across individual credit cards, team budgets, and corporate accounts. No one has the full picture.",
   },
   {
-    stat: "$8,400",
+    stat: "48%",
+    label: "API savings from model routing",
+    description:
+      "Teams routing simple tasks to flagship models (GPT-4o, Claude 3.5 Sonnet) overspend by up to 48% versus using mini/haiku/flash-class models for the same workloads.",
+  },
+  {
+    stat: "$11,200",
     label: "average annual waste per team",
     description:
-      "Across inactive seats, duplicate tools, and unused premium plans, the median 20-person engineering team wastes $700/month on AI tooling.",
+      "Across inactive seats, duplicate tools, model routing inefficiencies, and unused premium plans, the median 20-person engineering team wastes over $930/month on AI tooling.",
   },
 ];
 
@@ -44,7 +50,7 @@ export function WhyOverspend() {
           </p>
         </FadeIn>
 
-        <StaggerChildren className="grid sm:grid-cols-2 gap-5">
+        <StaggerChildren className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {reasons.map((r) => (
             <StaggerItem key={r.stat}>
               <div className="rounded-2xl border border-gray-100 bg-white p-7 flex flex-col gap-4 card-shadow hover:card-shadow-hover transition-all duration-200 hover:-translate-y-0.5">
